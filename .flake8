@@ -1,0 +1,10 @@
+[flake8]
+exclude = .git,*/__pycache__/*,*/migrations/*,settings*.py
+max-line-length = 100
+
+# E12x continuation line indentation
+# E251 no spaces around keyword / parameter equals
+# E261 at least two spaces before inline comment
+# E731 do not assign a lambda expression, use a def
+# W504 line break after binary operator
+ignore = E12,E251,E261,E731,W504
