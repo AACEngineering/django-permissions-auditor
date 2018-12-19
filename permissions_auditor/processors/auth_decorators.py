@@ -25,11 +25,13 @@ class PermissionRequiredDecoratorProcessor(BaseFuncViewProcessor):
 
         # Unwrap the function and search for the permission passed through
         # the @permission_required() decorator.
-        closures = inspect.getclosurevars(view).nonlocals
-        if 'test_func' in closures:
-            test_closures = inspect.getclosurevars(closures['test_func']).nonlocals
-            if 'perm' in test_closures:
-                perm = test_closures['perm']
+        closures = inspect.getclosurevars(view).nonlocals['test_func']
+        test_func_closures = inspect.getclosurevars(closures).nonlocals
+        if 'perm' in test_func_closures:
+            perm = test_func_closures['perm']
+
+            # Ensure perm is not a function
+            if not inspect.isfunction(perm):
                 if isinstance(perm, str):
                     permissions.append(perm)
                 else:

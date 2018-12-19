@@ -12,7 +12,7 @@ setup(
     long_description=README,
     author='AAC Engineering',
     license='MIT',
-    packages=find_packages(),
+    packages=find_packages(exclude=['example']),
     include_package_data=True,
     install_requires=[
         'django>=2.1'

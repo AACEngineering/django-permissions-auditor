@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Permissions Auditor Example Homepage</h1>
+
+{% if request.user.is_authenticated %}
+<p><a href="/admin/">Admin</a></p>
+<p><a href="{% url 'logout' %}?next=/">Logout</a></p>
+{% else %}
+<a href="{% url 'login' %}?next=/">Login</a>
+{% endif %}
+{% endblock content %}

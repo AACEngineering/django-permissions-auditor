@@ -27,3 +27,4 @@ htmlcov/
 .cache
 nosetests.xml
 coverage.xml
+*.sqlite3

@@ -7,6 +7,14 @@ from permissions_auditor.tests import test_views
 from permissions_auditor.tests.base import ProcessorTestCase
 
 
+class BaseProcessorTest(ProcessorTestCase):
+    def setUp(self):
+        self.processor = base.BaseProcessor()
+
+    def test_process(self):
+        self.assertProcessorResults(test_views.BaseView)
+
+
 class BaseFuncViewProcessorTest(ProcessorTestCase):
     def setUp(self):
         self.processor = base.BaseFuncViewProcessor()
