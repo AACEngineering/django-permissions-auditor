@@ -1,7 +1,12 @@
+from itertools import groupby
+
+from django.conf import settings
 from django.contrib import admin
 from django.db import models
 from django.template.response import TemplateResponse
-from django.urls import path, reverse
+from django.urls import path
+
+from permissions_auditor.core import get_views_by_module
 
 
 class Index(models.Model):
@@ -20,7 +25,7 @@ class PermissionsAuditorAdmin(admin.ModelAdmin):
         auditor_urls = [
             path('', self.admin_site.admin_view(self.permissions_index),
                  name='%s_%s_changelist' % info),
-            path('by_app/', self.admin_site.admin_view(self.permissions_by_app)),
+            path('by_module/', self.admin_site.admin_view(self.views_by_module)),
         ]
         return auditor_urls
 
@@ -30,8 +35,21 @@ class PermissionsAuditorAdmin(admin.ModelAdmin):
             request, "permissions_auditor/admin/index.html", context
         )
 
-    def permissions_by_app(self, request):
+    def views_by_module(self, request):
         context = dict(self.admin_site.each_context(request))
+
+        root_urlconf = __import__(settings.ROOT_URLCONF)
+        all_urlpatterns = root_urlconf.urls.urlpatterns
+        views = get_views_by_module(all_urlpatterns)
+
+        grouped_views = {}
+        for key, views_list in groupby(views, lambda x: x[0]):
+            for view in views_list:
+                grouped_views.setdefault(key, []).append(view[1:])
+
+        context.update({
+            'views': grouped_views
+        })
         return TemplateResponse(
-            request, "permissions_auditor/admin/permissions_by_app.html", context
+            request, "permissions_auditor/admin/views_by_module.html", context
         )

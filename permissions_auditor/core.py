@@ -3,7 +3,7 @@ from django.contrib.admindocs.views import simplify_regex
 from django.urls.resolvers import RegexPattern, RoutePattern, URLPattern, URLResolver
 from django.utils.module_loading import import_string
 
-import defaults
+from . import defaults
 
 
 def get_setting(name):
@@ -40,7 +40,7 @@ class ViewParser:
         return permissions, login_required, '\n'.join(list(set(filter(None, docstrings))))
 
 
-def get_views(urlpatterns, base_url=''):
+def get_views_by_module(urlpatterns, base_url=''):
     """
     Get all views in the specified urlpatterns.
     """
@@ -55,7 +55,7 @@ def get_views(urlpatterns, base_url=''):
             # pattern.namespace
 
             # Recursively fetch patterns
-            views.extend(get_views(pattern.url_patterns, base_url + str(pattern.pattern)))
+            views.extend(get_views_by_module(pattern.url_patterns, base_url + str(pattern.pattern)))
 
         elif isinstance(pattern, URLPattern) or isinstance(pattern, RegexPattern):
             view = pattern.callback

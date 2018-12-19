@@ -5,44 +5,39 @@
     {{ block.super }}
     <link rel="stylesheet" type="text/css" href="{% static "admin/css/changelists.css" %}">
     {{ media.css }}
-    {% if not actions_on_top and not actions_on_bottom %}
-        <style>
-            #changelist table thead th:first-child {width: inherit}
-        </style>
-    {% endif %}
 {% endblock %}
 
 {% if not is_popup %}
 {% block breadcrumbs %}
 <div class="breadcrumbs">
 <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
-&rsaquo; Permissions Auditor Views Index
+&rsaquo; {% trans 'Permissions Auditor' %}
 </div>
 {% endblock %}
 {% endif %}
 
 
 {% block content %}
-<h1>Select grouping method</h1>
+<h1>{% trans 'Select grouping method' %}</h1>
 <div id="content-main">
     <div class="module" id="changelist">
-    <div class="results">
-    <table id="result_list">
-        <thead>
-            <tr>
-                <th scope="col" {{ header.class_attrib }}>
-                    <div class="text"><span>Group By</span></div>
-                    <div class="clear"></div>                
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr><td><a href="by_app/">Django Application</a></td></tr>
-            <tr><td>Permission</td></tr>
-            <tr><td>No Grouping</td></tr>
-        </tbody>
-    </table>
-    </div>
+        <div class="results">
+            <table id="result_list">
+                <thead>
+                    <tr>
+                        <th scope="col" {{ header.class_attrib }}>
+                            <div class="text"><span>{% trans 'Group By' %}</span></div>
+                            <div class="clear"></div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><a href="by_module/">{% trans 'Module' %}</a></td></tr>
+                    <tr><td>{% trans 'Permission' %}</td></tr>
+                    <tr><td>{% trans 'No Grouping' %}</td></tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 {% endblock %}
