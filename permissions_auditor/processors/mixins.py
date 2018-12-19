@@ -2,16 +2,18 @@
 
 import inspect
 
-from base import BaseCBVFileredProcessor
+from .base import BaseCBVFileredProcessor
 
 
 class PermissionRequiredMixinProcessor(BaseCBVFileredProcessor):
     class_filter = 'django.contrib.auth.mixins.PermissionRequiredMixin'
 
     def get_permission_required(self, view):
-        return getattr(view, 'permission_required', [])
+        return view().get_permission_required()
 
     def get_docstring(self, view):
+        docstring = None
+
         # Check if has_permission has been overriden.
         if 'has_permission' in view.__dict__:
             docstring = inspect.getdoc(view.has_permission)
@@ -29,7 +31,7 @@ class LoginRequiredMixinProcessor(BaseCBVFileredProcessor):
         return True
 
     def get_docstring(self, view):
-        return 'Any logged in user can access'
+        return 'Logged in user required'
 
 
 class UserPassesTestMixinProcessor(BaseCBVFileredProcessor):

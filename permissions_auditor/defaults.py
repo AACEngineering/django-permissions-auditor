@@ -1,11 +1,14 @@
 PERMISSIONS_PROCESSORS = [
-    # Class Based
-    'permissions_config.processors.PermissionRequiredMixinProcessor',
-    'permissions_config.processors.LoginRequiredMixinProcessor',
-    'permissions_config.processors.UserPassesTestMixinProcessor'
-    # Function Based
-    'permissions_config.processors.PermissionRequiredDecoratorProcessor',
-    'permissions_config.processors.LoginRequiredDecoratorProcessor'
+    'permissions_config.processors.mixins.PermissionRequiredMixinProcessor',
+    'permissions_config.processors.mixins.LoginRequiredMixinProcessor',
+    'permissions_config.processors.mixins.UserPassesTestMixinProcessor'
+    'permissions_config.processors.decorators.PermissionRequiredDecoratorProcessor',
+    'permissions_config.processors.decorators.LoginRequiredDecoratorProcessor',
+    'permissions_config.processors.decorators.StaffMemberRequiredDecoratorProcessor',
+    'permissions_config.processors.decorators.SuperUserRequiredDecoratorProcessor',
+    'permissions_config.processors.decorators.UserPassesTestDecoratorProcessor',
 ]
-PERMISSIONS_NAMESPACE_FILTER = []
-PERMISSIONS_VIEW_NAME_FILTER = []
+PERMISSIONS_BLACKLIST = {
+    'namespaces': [],
+    'views': []
+}

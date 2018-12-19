@@ -23,7 +23,7 @@ class BaseProcessor:
         """
         Return True if the provided view requires the user to be loged in.
         """
-        return bool(self.get_permission_required())
+        return bool(self.get_permission_required(view))
 
     def get_docstring(self, view):
         """
@@ -56,7 +56,7 @@ class BaseCBVFileredProcessor(BaseCBVProcessor):
     class_filter = None
 
     def can_process(self, view):
-        if not super().can_process():
+        if not super().can_process(view):
             return False
 
         view_bases = [cls.__module__ + '.' + cls.__name__ for cls in view.__bases__]
