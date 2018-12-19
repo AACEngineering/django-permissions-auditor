@@ -1,11 +1,11 @@
-"""Processors for class based views."""
+"""Processors for django auth mixins."""
 
 import inspect
 
-from .base import BaseCBVFileredProcessor
+from .base import BaseFileredMixinProcessor
 
 
-class PermissionRequiredMixinProcessor(BaseCBVFileredProcessor):
+class PermissionRequiredMixinProcessor(BaseFileredMixinProcessor):
     class_filter = 'django.contrib.auth.mixins.PermissionRequiredMixin'
 
     def get_permission_required(self, view):
@@ -23,8 +23,11 @@ class PermissionRequiredMixinProcessor(BaseCBVFileredProcessor):
 
         return docstring
 
+    def get_login_required(self, view):
+        return True
 
-class LoginRequiredMixinProcessor(BaseCBVFileredProcessor):
+
+class LoginRequiredMixinProcessor(BaseFileredMixinProcessor):
     class_filter = 'django.contrib.auth.mixins.LoginRequiredMixin'
 
     def get_login_required(self, view):
@@ -34,7 +37,7 @@ class LoginRequiredMixinProcessor(BaseCBVFileredProcessor):
         return 'Logged in user required'
 
 
-class UserPassesTestMixinProcessor(BaseCBVFileredProcessor):
+class UserPassesTestMixinProcessor(BaseFileredMixinProcessor):
     class_filter = 'django.contrib.auth.mixins.UserPassesTestMixin'
 
     def get_docstring(self, view):

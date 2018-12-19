@@ -23,7 +23,7 @@ class BaseProcessor:
         """
         Return True if the provided view requires the user to be loged in.
         """
-        return bool(self.get_permission_required(view))
+        return False
 
     def get_docstring(self, view):
         """
@@ -40,16 +40,16 @@ class BaseFuncViewProcessor(BaseProcessor):
         return inspect.isfunction(view)
 
 
-class BaseCBVProcessor(BaseProcessor):
-    """Base class for parsing class based views."""
+class BaseMixinProcessor(BaseProcessor):
+    """Base class for parsing mixins on class based views."""
 
     def can_process(self, view):
         return inspect.isclass(view)
 
 
-class BaseCBVFileredProcessor(BaseCBVProcessor):
+class BaseFileredMixinProcessor(BaseMixinProcessor):
     """
-    Base class for parsing class based views.
+    Base class for parsing mixins on class based views.
     Override `class_filter` to filter the class names the processor applies to.
     ONLY checks top level base classes.
     """

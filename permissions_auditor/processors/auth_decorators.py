@@ -1,4 +1,4 @@
-"""Processors for function based views."""
+"""Processors for django auth decorators."""
 
 import inspect
 
@@ -85,6 +85,69 @@ class StaffMemberRequiredDecoratorProcessor(BaseFuncViewProcessor):
         return 'Staff member required'
 
 
+class ActiveUserRequiredDecoratorProcessor(BaseFuncViewProcessor):
+    """
+    This isn't an actual decorator, but is common enough to merit a processor.
+
+    It detects this:
+
+    @user_passes_test(lambda u: u.is_active)
+
+
+    Note that this processor will process the @staff_member_required decorator
+    since it includes an is_active check.
+    """
+
+    def can_process(self, view):
+        if not super().can_process(view):
+            return False
+
+        # Unwrap the function and look for the is_active property.
+        closures = inspect.getclosurevars(view).nonlocals
+        if 'test_func' in closures:
+            test_closures = inspect.getclosurevars(closures['test_func']).unbound
+            if 'is_active' in test_closures:
+                return True
+
+        return False
+
+    def get_login_required(self, view):
+        return True
+
+    def get_docstring(self, view):
+        return 'Active user required'
+
+
+class AnonymousUserRequiredDecoratorProcessor(BaseFuncViewProcessor):
+    """
+    This isn't an actual decorator, but is common enough to merit a processor.
+
+    It detects this:
+
+    @user_passes_test(lambda u: u.is_anonymous)
+
+
+    Note that this processor will process the @staff_member_required decorator
+    since it includes an is_active check.
+    """
+
+    def can_process(self, view):
+        if not super().can_process(view):
+            return False
+
+        # Unwrap the function and look for the is_anonymous property.
+        closures = inspect.getclosurevars(view).nonlocals
+        if 'test_func' in closures:
+            test_closures = inspect.getclosurevars(closures['test_func']).unbound
+            if 'is_anonymous' in test_closures:
+                return True
+
+        return False
+
+    def get_docstring(self, view):
+        return 'Anonymous user required'
+
+
 class SuperUserRequiredDecoratorProcessor(BaseFuncViewProcessor):
     """
     This isn't an actual decorator, but is common enough to merit a processor.
@@ -107,9 +170,6 @@ class SuperUserRequiredDecoratorProcessor(BaseFuncViewProcessor):
 
         return False
 
-    def get_login_required(self, view):
-        return True
-
     def get_docstring(self, view):
         return 'Superuser required'
 
@@ -127,7 +187,10 @@ class UserPassesTestDecoratorProcessor(BaseFuncViewProcessor):
 
         # The other decorators build from the user_passes_test decorator,
         # so we need to blacklist their functions so we don't override their results.
-        blacklist = ['is_authenticated', 'has_perms', 'is_staff', 'is_superuser', 'is_active']
+        blacklist = [
+            'is_authenticated', 'has_perms', 'is_staff', 'is_active', 'is_anonymous',
+            'is_superuser',
+        ]
 
         # Unwrap the function and look for any test functions inside the decorator.
         closures = inspect.getclosurevars(view).nonlocals

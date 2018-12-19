@@ -9,6 +9,9 @@ from django.contrib.auth.mixins import (
 from django.views.generic import View
 
 
+# Class Based Views
+
+
 class BaseView(View):
     pass
 
@@ -19,6 +22,10 @@ class LoginRequiredView(LoginRequiredMixin, View):
 
 class PermissionRequiredView(PermissionRequiredMixin, View):
     permission_required = 'tests.test_perm'
+
+
+class PermissionRequiredMultiView(PermissionRequiredMixin, View):
+    permission_required = ('tests.test_perm', 'tests.test_perm2')
 
 
 class PermissionRequiredViewDocstring(PermissionRequiredMixin, View):
@@ -78,8 +85,23 @@ def permission_required_view(request):
     pass
 
 
+@permission_required(('tests.test_perm', 'tests.test_perm2'))
+def permission_required_multi_view(request):
+    pass
+
+
 @staff_member_required
 def staff_member_required_view(request):
+    pass
+
+
+@user_passes_test(lambda u: u.is_active)
+def active_user_required_view(request):
+    pass
+
+
+@user_passes_test(lambda u: u.is_anonymous)
+def anonymous_user_required_view(request):
     pass
 
 
