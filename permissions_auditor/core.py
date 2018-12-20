@@ -1,6 +1,6 @@
 from collections import namedtuple
 
-from django.conf import settings
+from django.conf import ImproperlyConfigured, settings
 from django.contrib.admindocs.views import simplify_regex
 from django.urls.resolvers import RegexPattern, RoutePattern, URLPattern, URLResolver
 from django.utils.module_loading import import_string
@@ -20,14 +20,22 @@ class ViewParser:
     def load_processors(self):
         self._processors = []
 
-        for processor_path in get_setting('PERMISSIONS_PROCESSORS'):
-            processor = import_string(processor_path)
-            self._processors.append(processor())
+        for processor_path in get_setting('PERMISSIONS_AUDITOR_PROCESSORS'):
+
+            try:
+                processor = import_string(processor_path)
+                self._processors.append(processor())
+            except (ImportError, TypeError):
+                raise ImproperlyConfigured(
+                    '{} is not a valid permissions processor.'.format(processor_path)
+                )
 
     def parse(self, view):
         """
         Process a view.
-        Returns the permissions required, if login is required, and any docstrings.
+
+        Returns a tuple containing:
+        permissions (list), login_required (boolean), docstrings (str)
         """
         permissions = []
         login_required = False
@@ -42,10 +50,20 @@ class ViewParser:
         return permissions, login_required, '\n'.join(list(set(filter(None, docstrings))))
 
 
-def get_views_by_module(urlpatterns, base_url=''):
+def get_all_views(urlpatterns=None, base_url=''):
     """
     Get all views in the specified urlpatterns.
+
+    If urlpatterns is not specified, uses the `PERMISSIONS_AUDITOR_ROOT_URLCONF`
+    setting, which by default is the value of `ROOT_URLCONF` in your project settings.
+
+    Returns a list of namedtuples containing:
+    module, name, url, permissions, login_required, docstring
     """
+    if urlpatterns is None:
+        root_urlconf = __import__(get_setting('PERMISSIONS_AUDITOR_ROOT_URLCONF'))
+        urlpatterns = root_urlconf.urls.urlpatterns
+
     views = []
     result_tuple = namedtuple('View', [
         'module', 'name', 'url', 'permissions', 'login_required', 'docstring'
@@ -60,7 +78,7 @@ def get_views_by_module(urlpatterns, base_url=''):
             # pattern.namespace
 
             # Recursively fetch patterns
-            views.extend(get_views_by_module(pattern.url_patterns, base_url + str(pattern.pattern)))
+            views.extend(get_all_views(pattern.url_patterns, base_url + str(pattern.pattern)))
 
         elif isinstance(pattern, URLPattern) or isinstance(pattern, RegexPattern):
             view = pattern.callback

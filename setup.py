@@ -20,7 +20,7 @@ setup(
     ],
     zip_safe=False,
     classifiers=[
-        'Development Status :: 1 - Planning',
+        'Development Status :: 3 - Alpha',
         'Environment :: Web Environment',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
@@ -30,6 +30,8 @@ setup(
         'Programming Language :: Python :: 3.6',
         'Framework :: Django',
         'Framework :: Django :: 2.1',
+        'Topic :: Internet :: WWW/HTTP :: Site Management',
+        'Topic :: Internet :: WWW/HTTP :: Site Management :: Link Checking',
     ],
     keywords='django,admin,permissions,audit,auditor',
 )

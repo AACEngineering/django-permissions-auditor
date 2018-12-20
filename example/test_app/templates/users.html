@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Permissions Auditor Example Users</h1>
+
+<ul>
+    {% for user in users %}
+    <li><a href="{% url 'admin:auth_user_change' user.id %}">{{ user }}: {{ user.first_name }} {{ user.last_name }}</a></li>
+    {% endfor %}
+</ul>
+
+{% endblock content %}

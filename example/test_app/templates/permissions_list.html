@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Permissions Auditor Permissions List Example</h1>
+
+<table style="width: 100%">
+    <thead>
+        <tr>
+            <th>Module</th>
+            <th>View Name</th>
+            <th>URL</th>
+            <th>Permissions</th>
+            <th>Login Required</th>
+            <th>Additional Info</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for view in views %}
+        <tr>
+            <td>{{ view.module }}</td>
+            <td>{{ view.name }}</td>
+            <td>{{ view.url }}</td>
+            <td>{{ view.permissions }}</td>
+            <td>{{ view.login_required }}</td>
+            <td>{{ view.docstring }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock content %}

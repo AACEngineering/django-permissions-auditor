@@ -5,3 +5,4 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'permissions_auditor',
 ]
+ROOT_URLCONF = None
