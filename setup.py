@@ -19,6 +19,7 @@ setup(
         'setuptools'
     ],
     zip_safe=False,
+    test_suite='runtests.runtests',
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Environment :: Web Environment',
