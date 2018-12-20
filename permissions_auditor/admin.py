@@ -3,10 +3,10 @@ from django.db import models
 from django.template.response import TemplateResponse
 from django.urls import path
 
-from permissions_auditor.core import get_all_views, get_setting
+from permissions_auditor.core import get_all_views, _get_setting
 
 
-if get_setting('PERMISSIONS_AUDITOR_ADMIN'):
+if _get_setting('PERMISSIONS_AUDITOR_ADMIN'):
 
     class Index(models.Model):
         """Dummy model to display our pages in the admin."""
@@ -19,14 +19,11 @@ if get_setting('PERMISSIONS_AUDITOR_ADMIN'):
 
         def get_urls(self):
             info = self.model._meta.app_label, self.model._meta.model_name
-
-            auditor_urls = [
-                path('', self.admin_site.admin_view(self.views_by_module),
-                     name='%s_%s_changelist' % info),
+            return [
+                path('', self.admin_site.admin_view(self.index), name='%s_%s_changelist' % info),
             ]
-            return auditor_urls
 
-        def views_by_module(self, request):
+        def index(self, request):
             context = dict(self.admin_site.each_context(request))
 
             context.update({
@@ -36,3 +33,15 @@ if get_setting('PERMISSIONS_AUDITOR_ADMIN'):
             return TemplateResponse(
                 request, "permissions_auditor/admin/views_index.html", context
             )
+
+        def has_view_permission(self, request, obj=None):
+            return request.user.is_staff
+
+        def has_add_permission(self, request, obj=None):
+            return False
+
+        def has_change_permission(self, request, obj=None):
+            return False
+
+        def has_delete_permission(self, request, obj=None):
+            return False

@@ -45,7 +45,7 @@ class TestLoginRequiredMixinProcessor(MixinProcessorTestCaseMixin, ProcessorTest
             can_process=True,
             permissions=[],
             login_required=True,
-            docstring='Logged in user required'
+            docstring=None
         )
 
     def test_cb_permissionsrequiredview(self):

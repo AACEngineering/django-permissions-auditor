@@ -11,8 +11,10 @@ PERMISSIONS_AUDITOR_PROCESSORS = [
     'permissions_auditor.processors.auth_decorators.UserPassesTestDecoratorProcessor',
 ]
 PERMISSIONS_AUDITOR_BLACKLIST = {
-    'namespaces': [],
-    'views': [],
+    'namespaces': [
+        'admin',
+    ],
+    'view_names': [],
     'modules': [],
 }
 PERMISSIONS_AUDITOR_ADMIN = True

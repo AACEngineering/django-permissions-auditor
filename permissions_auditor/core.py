@@ -8,8 +8,19 @@ from django.utils.module_loading import import_string
 from . import defaults
 
 
-def get_setting(name):
+def _get_setting(name):
     return getattr(settings, name, getattr(defaults, name))
+
+
+def _get_blacklist(name):
+    blacklist = _get_setting('PERMISSIONS_AUDITOR_BLACKLIST')
+
+    # Fall back to the defauls if the user does not provide the specific
+    # blacklist in their settings.
+    if name not in blacklist:
+        blacklist = getattr(defaults, 'PERMISSIONS_AUDITOR_BLACKLIST')
+
+    return blacklist[name]
 
 
 class ViewParser:
@@ -20,7 +31,7 @@ class ViewParser:
     def load_processors(self):
         self._processors = []
 
-        for processor_path in get_setting('PERMISSIONS_AUDITOR_PROCESSORS'):
+        for processor_path in _get_setting('PERMISSIONS_AUDITOR_PROCESSORS'):
 
             try:
                 processor = import_string(processor_path)
@@ -61,7 +72,7 @@ def get_all_views(urlpatterns=None, base_url=''):
     module, name, url, permissions, login_required, docstring
     """
     if urlpatterns is None:
-        root_urlconf = __import__(get_setting('PERMISSIONS_AUDITOR_ROOT_URLCONF'))
+        root_urlconf = __import__(_get_setting('PERMISSIONS_AUDITOR_ROOT_URLCONF'))
         urlpatterns = root_urlconf.urls.urlpatterns
 
     views = []
@@ -74,8 +85,8 @@ def get_all_views(urlpatterns=None, base_url=''):
     for pattern in urlpatterns:
         if isinstance(pattern, RoutePattern) or isinstance(pattern, URLResolver):
 
-            # TODO: Namespace filtering
-            # pattern.namespace
+            if pattern.namespace in _get_blacklist('namespaces'):
+                continue
 
             # Recursively fetch patterns
             views.extend(get_all_views(pattern.url_patterns, base_url + str(pattern.pattern)))
@@ -86,8 +97,9 @@ def get_all_views(urlpatterns=None, base_url=''):
             # If this is a CBV, use the actual class instead of the as_view() classmethod.
             view = getattr(view, 'view_class', view)
 
-            # TODO: view name / module filtering
-            # view.__module__ view.__name__
+            if view.__name__ in _get_blacklist('view_names') or \
+                    view.__module__ in _get_blacklist('modules'):
+                continue
 
             permissions, login_required, docstring = parser.parse(view)
 

@@ -61,9 +61,6 @@ class LoginRequiredDecoratorProcessor(BaseFuncViewProcessor):
     def get_login_required(self, view):
         return True
 
-    def get_docstring(self, view):
-        return 'Logged in user required'
-
 
 class StaffMemberRequiredDecoratorProcessor(BaseFuncViewProcessor):
 

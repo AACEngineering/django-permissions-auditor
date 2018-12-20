@@ -33,7 +33,7 @@ class TestLoginRequiredDecoratorProcessor(DecoratorProcessorTestCaseMixin, Proce
             can_process=True,
             permissions=[],
             login_required=True,
-            docstring='Logged in user required'
+            docstring=None
         )
 
     def test_permission_required_view(self):
