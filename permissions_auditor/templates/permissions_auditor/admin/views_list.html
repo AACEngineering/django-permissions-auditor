@@ -1,0 +1,130 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static admin_list %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static "admin/css/changelists.css" %}">
+    {{ media.css }}
+    <style>
+        .results {margin-right: 280px; width: auto}
+        table.view-table {margin-bottom:2em}
+        table.view-table > thead > tr > th.header-name {width: 15%}
+        table.view-table > thead > tr > th.header-url {width: 25%}
+        table.view-table > thead > tr > th.header-permission_required {width: 15%}
+        table.view-table > thead > tr > th.header-login_required {width: 10%}
+        table.view-table > thead > tr > th.header-additional_info {width: 35%}
+        table.view-table > tbody > tr > td.field-additional_info > p {margin: 0; padding: 0}
+    </style>
+{% endblock %}
+
+{% block title %}{% trans 'Permissions Auditor' %} | {% trans 'Django site admin' %}{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; {% trans 'Permissions Auditor' %}
+</div>
+{% endblock %}
+
+{% block content %}
+<h1>{% trans 'Views By' %} {{ group_by|title }}</h1>
+
+{% if group_by == 'module' %}
+    {% regroup views|dictsort:"module" by module as views_list %}
+{% elif group_by == 'permission' %}
+    {% regroup views|dictsort:"permissions" by permissions as views_list %}
+{% else %}
+    {% regroup views|dictsort:"name" by None as views_list %}
+{% endif %}
+
+<div id="content-main">
+    <div class="module filtered" id="changelist">
+        <div id="changelist-filter">
+            <h2>{% trans 'Filter' %}</h2>
+            <h3>{% trans 'Group By' %}</h3>
+            <ul>
+                <li {% if group_by == "module" %}class="selected"{% endif %}>
+                    <a href="?group_by=module">{% trans 'Module' %}</a>
+                </li>
+                <li {% if group_by == "permission" %}class="selected"{% endif %}>
+                    <a href="?group_by=permission">{% trans 'Permission' %}</a>
+                </li>
+                <li {% if group_by == "none" %}class="selected"{% endif %}>
+                    <a href="?group_by=none">{% trans 'No Grouping' %}</a>
+                </li>
+            </ul>
+
+            {% if group_by != 'none' %}
+            <h3>{% trans 'Navigate' %}</h3>
+            <ul>
+                {% if group_by == 'permission' %}
+                    {% for view in views_list %}
+                    <li><a href="#{{ view.grouper }}">{{ view.grouper|default:"No Permission" }}</a></li>
+                    {% endfor %}
+                {% else %}
+                    {% for view in views_list %}
+                    <li><a href="#{{ view.grouper }}">{{ view.grouper|default:"None" }}</a></li>
+                    {% endfor %}
+                {% endif %}
+            </ul>
+            {% endif %}
+        </div>
+
+        <div class="results">
+            {% for grouper, view_list in views_list %}
+            
+            {% if group_by == 'module' %}
+                <h2 id="{{ grouper }}">{{ grouper }}</h2>
+            {% elif group_by == 'permission' %}
+                <h2 id="{{ grouper }}">{{ grouper|default:"No permission" }}</h2>
+            {% else %}
+                <h2 id="">Name</h2>
+            {% endif %}
+
+            <table id="result_list" class="view-table">
+                <thead>
+                    <tr>
+                        <th class="header-name">
+                            <div class="text"><span>{% trans 'Name' %}</span></div>
+                        </th>
+                        <th class="header-url">
+                            <div class="text"><span>{% trans 'URL' %}</span></div>
+                        </th>
+                        <th class="header-permission_required">
+                            <div class="text"><span>{% trans 'Permission Required' %}</span></div>
+                        </th>
+                        <th class="header-login_required">
+                            <div class="text"><span>{% trans 'Login Required' %}</span></div>
+                        </th>
+                        <th class="header-additional_info">
+                            <div class="text"><span>{% trans 'Additional Info' %}</span></div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for view in view_list %}
+                    <tr class="{% cycle 'row1' 'row2' %}">
+                        <td>{{ view.name }}</td>
+                        <td><i>{{ view.url }}</i></td>
+                        <td>
+                            {% for permission in view.permissions %}
+                                {{ permission }}
+                            {% endfor %}
+                        </td>
+                        <td>
+                            {% if view.login_required %}
+                                <img src="{% static 'admin/img/icon-yes.svg' %}" alt="yes">
+                            {% else %}
+                                <img src="{% static 'admin/img/icon-no.svg' %}" alt="yes">
+                            {% endif %}
+                        </td>
+                        <td class="field-additional_info">{{ view.docstring|linebreaks }}</td>
+                    </tr>
+                    {% endfor %}{% resetcycle %}
+                </tbody>
+            </table>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

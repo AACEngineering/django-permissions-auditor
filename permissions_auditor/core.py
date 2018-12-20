@@ -1,3 +1,5 @@
+from collections import namedtuple
+
 from django.conf import settings
 from django.contrib.admindocs.views import simplify_regex
 from django.urls.resolvers import RegexPattern, RoutePattern, URLPattern, URLResolver
@@ -45,6 +47,9 @@ def get_views_by_module(urlpatterns, base_url=''):
     Get all views in the specified urlpatterns.
     """
     views = []
+    result_tuple = namedtuple('View', [
+        'module', 'name', 'url', 'permissions', 'login_required', 'docstring'
+    ])
 
     parser = ViewParser()
 
@@ -68,13 +73,13 @@ def get_views_by_module(urlpatterns, base_url=''):
 
             permissions, login_required, docstring = parser.parse(view)
 
-            views.append([
+            views.append(result_tuple._make([
                 view.__module__,
                 view.__name__,
                 simplify_regex(base_url + str(pattern.pattern)),
                 permissions,
                 login_required,
                 docstring
-            ])
+            ]))
 
     return views
