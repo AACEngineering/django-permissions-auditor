@@ -198,5 +198,8 @@ class UserPassesTestDecoratorProcessor(BaseFuncViewProcessor):
 
         return False
 
+    def get_login_required(self, view):
+        return None
+
     def get_docstring(self, view):
         return 'Custom user test'

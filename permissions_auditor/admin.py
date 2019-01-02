@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.db import models
 from django.template.response import TemplateResponse
 from django.urls import path
+from django.utils.translation import gettext_lazy as _
 
 from permissions_auditor.core import get_all_views, _get_setting
 
@@ -9,7 +10,7 @@ from permissions_auditor.core import get_all_views, _get_setting
 class Index(models.Model):
     """Dummy model to display our pages in the admin."""
     class Meta:
-        verbose_name_plural = 'Site Views Index'
+        verbose_name_plural = _('Site Views Index')
         app_label = 'permissions_auditor'
 
 

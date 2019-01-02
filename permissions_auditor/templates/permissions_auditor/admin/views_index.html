@@ -124,11 +124,13 @@
                             <td><i>{{ view.url }}</i></td>
                             <td>
                                 {% for permission in view.permissions %}
-                                    {{ permission }}
+                                    {{ permission }}<br>
                                 {% endfor %}
                             </td>
                             <td>
-                                {% if view.login_required %}
+                                {% if view.login_required == None %}
+                                    <img src="{% static 'admin/img/icon-unknown.svg' %}" alt="unknown">
+                                {% elif view.login_required %}
                                     <img src="{% static 'admin/img/icon-yes.svg' %}" alt="yes">
                                 {% else %}
                                     <img src="{% static 'admin/img/icon-no.svg' %}" alt="no">

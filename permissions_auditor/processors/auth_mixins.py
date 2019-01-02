@@ -11,6 +11,9 @@ class PermissionRequiredMixinProcessor(BaseFileredMixinProcessor):
     def get_permission_required(self, view):
         return view().get_permission_required()
 
+    def get_login_required(self, view):
+        return True
+
     def get_docstring(self, view):
         docstring = None
 
@@ -23,9 +26,6 @@ class PermissionRequiredMixinProcessor(BaseFileredMixinProcessor):
 
         return docstring
 
-    def get_login_required(self, view):
-        return True
-
 
 class LoginRequiredMixinProcessor(BaseFileredMixinProcessor):
     class_filter = 'django.contrib.auth.mixins.LoginRequiredMixin'
@@ -36,6 +36,9 @@ class LoginRequiredMixinProcessor(BaseFileredMixinProcessor):
 
 class UserPassesTestMixinProcessor(BaseFileredMixinProcessor):
     class_filter = 'django.contrib.auth.mixins.UserPassesTestMixin'
+
+    def get_login_required(self, view):
+        return None
 
     def get_docstring(self, view):
         docstring = inspect.getdoc(view().get_test_func())

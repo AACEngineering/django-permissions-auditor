@@ -21,7 +21,7 @@
             <td>{{ view.name }}</td>
             <td>{{ view.url }}</td>
             <td>{{ view.permissions }}</td>
-            <td>{{ view.login_required }}</td>
+            <td>{{ view.login_required|default_if_none:"Unknown" }}</td>
             <td>{{ view.docstring }}</td>
         </tr>
         {% endfor %}

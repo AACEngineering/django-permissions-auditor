@@ -51,7 +51,7 @@ class ViewParser:
         Process a view.
 
         Returns a tuple containing:
-        permissions (list), login_required (boolean), docstrings (str)
+        permissions (list), login_required (boolean or None), docstrings (str)
         """
         permissions = []
         login_required = False
@@ -60,7 +60,13 @@ class ViewParser:
         for processor in self._processors:
             if processor.can_process(view):
                 permissions.extend(processor.get_permission_required(view))
-                login_required = processor.get_login_required(view) or login_required
+
+                login_required_result = processor.get_login_required(view)
+                if login_required_result is None and not login_required:
+                    login_required = login_required_result
+                else:
+                    login_required = login_required_result or login_required
+
                 docstrings.append(processor.get_docstring(view))
 
         return permissions, login_required, '\n'.join(list(set(filter(None, docstrings))))
