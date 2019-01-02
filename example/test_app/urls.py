@@ -10,6 +10,7 @@ urlpatterns = [
     path('logout/done/', function_based.logged_out_page, name='logged_out'),
 
     path('users/', function_based.user_index, name='user_index'),
+    path('super_users/', function_based.superuser_index, name='superuser_index'),
 
     path('permissions/', function_based.permissions_index, name='permissions_index'),
 ]

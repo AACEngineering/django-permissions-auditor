@@ -8,7 +8,7 @@ with open(os.path.join(os.path.dirname(__file__), 'README.md')) as readme:
 setup(
     name='django-permissions-auditor',
     version=__import__('permissions_auditor').__version__,
-    description='django-easymde is a WYSIWYG markdown editor for Django',
+    description='django-permissions-auditor is a tool to audit access control on your django app.',
     long_description=README,
     author='AAC Engineering',
     license='MIT',

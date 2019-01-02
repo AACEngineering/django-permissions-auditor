@@ -124,10 +124,6 @@ class AnonymousUserRequiredDecoratorProcessor(BaseFuncViewProcessor):
     It detects this:
 
     @user_passes_test(lambda u: u.is_anonymous)
-
-
-    Note that this processor will process the @staff_member_required decorator
-    since it includes an is_active check.
     """
 
     def can_process(self, view):
@@ -169,6 +165,9 @@ class SuperUserRequiredDecoratorProcessor(BaseFuncViewProcessor):
 
         return False
 
+    def get_login_required(self, view):
+        return True
+
     def get_docstring(self, view):
         return 'Superuser required'
 
@@ -186,10 +185,10 @@ class UserPassesTestDecoratorProcessor(BaseFuncViewProcessor):
 
         # The other decorators build from the user_passes_test decorator,
         # so we need to blacklist their functions so we don't override their results.
-        blacklist = [
+        blacklist = (
             'is_authenticated', 'has_perms', 'is_staff', 'is_active', 'is_anonymous',
             'is_superuser',
-        ]
+        )
 
         # Unwrap the function and look for any test functions inside the decorator.
         closures = inspect.getclosurevars(view).nonlocals

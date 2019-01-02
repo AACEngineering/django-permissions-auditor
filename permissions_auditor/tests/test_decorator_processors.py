@@ -246,7 +246,7 @@ class SuperUserRequiredDecoratorProcessor(DecoratorProcessorTestCaseMixin, Proce
             test_views.superuser_required_view,
             can_process=True,
             permissions=[],
-            login_required=False,
+            login_required=True,
             docstring='Superuser required'
         )
 

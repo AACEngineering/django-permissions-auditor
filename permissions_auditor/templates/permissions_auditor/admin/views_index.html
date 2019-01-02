@@ -27,7 +27,12 @@
 {% endblock %}
 
 {% block content %}
-<h1>{% trans 'Views By' %} {{ group_by|title }}</h1>
+
+{% if group_by != 'none' %}
+    <h1>{% trans 'Views By' %} {{ group_by|title }}</h1>
+{% else %}
+    <h1>{% trans 'Views' %}</h1>
+{% endif %}
 
 {% if group_by == 'module' %}
     {% regroup views|dictsort:"module" by module as views_list %}

@@ -23,6 +23,11 @@ def _get_blacklist(name):
     return blacklist[name]
 
 
+NAMESPACE_BLACKLIST = tuple(_get_blacklist('namespaces'))
+VIEW_BLACKLIST = tuple(_get_blacklist('view_names'))
+MODULE_BLACKLIST = tuple(_get_blacklist('modules'))
+
+
 class ViewParser:
 
     def __init__(self):
@@ -85,7 +90,7 @@ def get_all_views(urlpatterns=None, base_url=''):
     for pattern in urlpatterns:
         if isinstance(pattern, RoutePattern) or isinstance(pattern, URLResolver):
 
-            if pattern.namespace in _get_blacklist('namespaces'):
+            if pattern.namespace in NAMESPACE_BLACKLIST:
                 continue
 
             # Recursively fetch patterns
@@ -97,8 +102,7 @@ def get_all_views(urlpatterns=None, base_url=''):
             # If this is a CBV, use the actual class instead of the as_view() classmethod.
             view = getattr(view, 'view_class', view)
 
-            if view.__name__ in _get_blacklist('view_names') or \
-                    view.__module__ in _get_blacklist('modules'):
+            if view.__name__ in VIEW_BLACKLIST or view.__module__ in MODULE_BLACKLIST:
                 continue
 
             permissions, login_required, docstring = parser.parse(view)
