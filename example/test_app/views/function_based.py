@@ -8,7 +8,7 @@ from django.shortcuts import render
 User = get_user_model()
 
 
-@permission_required('auth.view_users')
+@permission_required('auth.view_user')
 def user_index(request):
     context = {
         'users': User.objects.filter(is_superuser=False)

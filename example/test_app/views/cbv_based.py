@@ -12,7 +12,7 @@ class UserIndex(PermissionRequiredMixin, TemplateView):
     permission_required = 'auth.view_user'
 
     def has_permission(self):
-        """Docstrings on `has_permission()` are displayed in the admin."""
+        """PermissionRequiredMixin - Docstrings on `has_permission()` are displayed in the admin."""
         return super().has_permission()
 
     def get_context_data(self, **kwargs):
@@ -26,7 +26,7 @@ class SuperUserIndex(UserPassesTestMixin, TemplateView):
     permission_required = 'auth.view_user'
 
     def test_func(self):
-        """The user must be a superuser to access."""
+        """UserPassesTestMixin - The user must be a superuser to access."""
         return self.request.user.is_superuser
 
     def get_context_data(self, **kwargs):

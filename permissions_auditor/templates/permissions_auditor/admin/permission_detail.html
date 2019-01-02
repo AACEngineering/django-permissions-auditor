@@ -1,0 +1,140 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}">
+    <link rel="stylesheet" type="text/css" href="{% static "admin/css/changelists.css" %}">
+    <style>
+        .results {width: auto}
+        table.view-table {margin-bottom:2em}
+        table.view-table > thead > tr > th.header-name {width: 15%}
+        table.view-table > thead > tr > th.header-url {width: 25%}
+        table.view-table > thead > tr > th.header-permission_required {width: 15%}
+        table.view-table > thead > tr > th.header-login_required {width: 10%}
+        table.view-table > thead > tr > th.header-additional_info {width: 35%}
+        table.view-table > tbody > tr > td.field-additional_info > p {margin: 0; padding: 0}
+    </style>
+    <script type="text/javascript" src="{% url 'admin:jsi18n' %}"></script>
+    {{ media }}
+{% endblock %}
+
+{% block title %}{% trans 'Permissions Auditor' %} | {% trans 'Django site admin' %}{% endblock %}
+
+{% block coltype %}colM{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:permissions_auditor_index_changelist' %}">{% trans 'Permissions Auditor' %}</a>
+&rsaquo; {{ permission }}
+</div>
+{% endblock %}
+
+{% block content %}
+{% regroup views|dictsort:"module" by permissions as views_list %}
+
+<h1>{{ permission }}</h1>
+
+<div id="content-main">
+    <div class="module filtered" id="changelist">
+        <h2>{% trans 'Views with this Permission' %}</h2>
+
+        <table id="result_list" class="view-table">
+            <thead>
+                <tr>
+                    <th class="header-name">
+                        <div class="text"><span>{% trans 'Name' %}</span></div>
+                    </th>
+                    <th class="header-url">
+                        <div class="text"><span>{% trans 'URL' %}</span></div>
+                    </th>
+                    <th class="header-permission_required">
+                        <div class="text"><span>{% trans 'Permission Required' %}</span></div>
+                    </th>
+                    <th class="header-login_required">
+                        <div class="text"><span>{% trans 'Login Required' %}</span></div>
+                    </th>
+                    <th class="header-additional_info">
+                        <div class="text"><span>{% trans 'Additional Info' %}</span></div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+
+            {% for grouper, view_list in views_list %}
+                {% if permission in grouper %}
+                    {% for view in view_list %}
+                    <tr class="{% cycle 'row1' 'row2' %}">
+                        <td>{{ view.name }}</td>
+                        <td><i>{{ view.url }}</i></td>
+                        <td>
+                            {% for perm in view.permissions %}
+                                {{ perm }}<br>
+                            {% endfor %}
+                        </td>
+                        <td>
+                            {% if view.login_required == None %}
+                                <img src="{% static 'admin/img/icon-unknown.svg' %}" alt="unknown">
+                            {% elif view.login_required %}
+                                <img src="{% static 'admin/img/icon-yes.svg' %}" alt="yes">
+                            {% else %}
+                                <img src="{% static 'admin/img/icon-no.svg' %}" alt="no">
+                            {% endif %}
+                        </td>
+                        <td class="field-additional_info">{{ view.docstring|linebreaks }}</td>
+                    </tr>
+                    {% endfor %}{% resetcycle %}
+                {% endif %}
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <form action="{{ form_url }}" method="post" id="{{ opts.model_name }}_form" novalidate>{% csrf_token %}{% block form_top %}{% endblock %}
+    <div>
+    {% if is_popup %}<input type="hidden" name="{{ is_popup_var }}" value="1">{% endif %}
+    {% if to_field %}<input type="hidden" name="{{ to_field_var }}" value="{{ to_field }}">{% endif %}
+    {% if save_on_top %}{% block submit_buttons_top %}{% submit_row %}{% endblock %}{% endif %}
+    {% if errors %}
+        <p class="errornote">
+        {% if errors|length == 1 %}{% trans "Please correct the error below." %}{% else %}{% trans "Please correct the errors below." %}{% endif %}
+        </p>
+        {{ adminform.form.non_field_errors }}
+    {% endif %}
+
+    {% block field_sets %}
+    {% for fieldset in adminform %}
+      {% include "admin/includes/fieldset.html" %}
+    {% endfor %}
+    {% endblock %}
+
+    {% block after_field_sets %}{% endblock %}
+
+    {% block inline_field_sets %}
+    {% for inline_admin_formset in inline_admin_formsets %}
+        {% include inline_admin_formset.opts.template %}
+    {% endfor %}
+    {% endblock %}
+
+    {% block after_related_objects %}{% endblock %}
+
+    {% block submit_buttons_bottom %}{% submit_row %}{% endblock %}
+
+    {% block admin_change_form_document_ready %}
+        <script type="text/javascript"
+                id="django-admin-form-add-constants"
+                src="{% static 'admin/js/change_form.js' %}"
+                {% if adminform and add %}
+                    data-model-name="{{ opts.model_name }}"
+                {% endif %}>
+        </script>
+    {% endblock %}
+
+    {# JavaScript for prepopulated fields #}
+    {% prepopulated_fields_js %}
+
+    </div>
+    </form>
+</div>
+{% endblock %}
