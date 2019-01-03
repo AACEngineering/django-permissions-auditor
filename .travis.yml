@@ -22,8 +22,8 @@ matrix:
         env: TOXENV=dist
         script:
           - python setup.py bdist_wheel
-          - rm -r django-permissions-auditor.egg-info
-          - tox --installpkg ./dist/django-permissions-auditor-*.whl
+          - rm -r django_permissions_auditor.egg-info
+          - tox --installpkg ./dist/django_permissions_auditor-*.whl
           - tox
 
     allow_failures:
