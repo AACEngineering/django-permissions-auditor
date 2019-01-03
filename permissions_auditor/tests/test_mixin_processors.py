@@ -130,7 +130,7 @@ class TestUserPassesTestMixinProcessor(MixinProcessorTestCaseMixin, ProcessorTes
             test_views.UserPassesTestView,
             can_process=True,
             permissions=[],
-            login_required=False,
+            login_required=None,
             docstring='Custom (no docstring found)'
         )
 
@@ -143,7 +143,7 @@ class TestUserPassesTestMixinProcessor(MixinProcessorTestCaseMixin, ProcessorTes
             test_views.UserPassesTestViewDocstring,
             can_process=True,
             permissions=[],
-            login_required=False,
+            login_required=None,
             docstring='Custom docstrings should be detected.'
         )
 
@@ -156,7 +156,7 @@ class TestUserPassesTestMixinProcessor(MixinProcessorTestCaseMixin, ProcessorTes
             test_views.UserPassesTestViewNoDocstring,
             can_process=True,
             permissions=[],
-            login_required=False,
+            login_required=None,
             docstring='Custom (no docstring found)'
         )
 
@@ -169,6 +169,6 @@ class TestUserPassesTestMixinProcessor(MixinProcessorTestCaseMixin, ProcessorTes
             test_views.UserPassesTestViewCustomFunc,
             can_process=True,
             permissions=[],
-            login_required=False,
+            login_required=None,
             docstring='Custom docstrings should be detected.'
         )

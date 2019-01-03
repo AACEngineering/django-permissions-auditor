@@ -1,4 +1,9 @@
 SECRET_KEY = 'test-key'
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+    }
+}
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',

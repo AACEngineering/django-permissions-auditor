@@ -2,6 +2,7 @@ from collections import namedtuple
 
 from django.conf import ImproperlyConfigured, settings
 from django.contrib.admindocs.views import simplify_regex
+from django.core.cache import cache
 from django.urls.resolvers import RegexPattern, RoutePattern, URLPattern, URLResolver
 from django.utils.module_loading import import_string
 
@@ -23,9 +24,18 @@ def _get_blacklist(name):
     return blacklist[name]
 
 
+def _get_cache_key(base_url):
+    prefix = _get_setting('PERMISSIONS_AUDITOR_CACHE_KEY')
+    return '{}.{}'.format(prefix, base_url)
+
+
 NAMESPACE_BLACKLIST = tuple(_get_blacklist('namespaces'))
 VIEW_BLACKLIST = tuple(_get_blacklist('view_names'))
 MODULE_BLACKLIST = tuple(_get_blacklist('modules'))
+
+ViewDetails = namedtuple('ViewDetails', [
+    'module', 'name', 'url', 'permissions', 'login_required', 'docstring'
+])
 
 
 class ViewParser:
@@ -51,7 +61,7 @@ class ViewParser:
         Process a view.
 
         Returns a tuple containing:
-        permissions (list), login_required (boolean or None), docstrings (str)
+        permissions (list), login_required (boolean or None), docstring (str)
         """
         permissions = []
         login_required = False
@@ -79,47 +89,52 @@ def get_all_views(urlpatterns=None, base_url=''):
     If urlpatterns is not specified, uses the `PERMISSIONS_AUDITOR_ROOT_URLCONF`
     setting, which by default is the value of `ROOT_URLCONF` in your project settings.
 
-    Returns a list of namedtuples containing:
-    module, name, url, permissions, login_required, docstring
+    Returns a list of `View` namedtuples.
     """
-    if urlpatterns is None:
-        root_urlconf = __import__(_get_setting('PERMISSIONS_AUDITOR_ROOT_URLCONF'))
-        urlpatterns = root_urlconf.urls.urlpatterns
+    cache_key = _get_cache_key(base_url)
+    cache_timeout = _get_setting('PERMISSIONS_AUDITOR_CACHE_TIMEOUT')
 
-    views = []
-    result_tuple = namedtuple('View', [
-        'module', 'name', 'url', 'permissions', 'login_required', 'docstring'
-    ])
+    views = cache.get(cache_key)
 
-    parser = ViewParser()
+    if views is None:
+        views = []
 
-    for pattern in urlpatterns:
-        if isinstance(pattern, RoutePattern) or isinstance(pattern, URLResolver):
+        if urlpatterns is None:
+            root_urlconf = __import__(_get_setting('PERMISSIONS_AUDITOR_ROOT_URLCONF'))
+            urlpatterns = root_urlconf.urls.urlpatterns
 
-            if pattern.namespace in NAMESPACE_BLACKLIST:
-                continue
+        parser = ViewParser()
 
-            # Recursively fetch patterns
-            views.extend(get_all_views(pattern.url_patterns, base_url + str(pattern.pattern)))
+        for pattern in urlpatterns:
+            if isinstance(pattern, RoutePattern) or isinstance(pattern, URLResolver):
 
-        elif isinstance(pattern, URLPattern) or isinstance(pattern, RegexPattern):
-            view = pattern.callback
+                if pattern.namespace in NAMESPACE_BLACKLIST:
+                    continue
 
-            # If this is a CBV, use the actual class instead of the as_view() classmethod.
-            view = getattr(view, 'view_class', view)
+                # Recursively fetch patterns
+                views.extend(get_all_views(pattern.url_patterns, base_url + str(pattern.pattern)))
 
-            if view.__name__ in VIEW_BLACKLIST or view.__module__ in MODULE_BLACKLIST:
-                continue
+            elif isinstance(pattern, URLPattern) or isinstance(pattern, RegexPattern):
+                view = pattern.callback
 
-            permissions, login_required, docstring = parser.parse(view)
+                # If this is a CBV, use the actual class instead of the as_view() classmethod.
+                view = getattr(view, 'view_class', view)
 
-            views.append(result_tuple._make([
-                view.__module__,
-                view.__name__,
-                simplify_regex(base_url + str(pattern.pattern)),
-                permissions,
-                login_required,
-                docstring
-            ]))
+                full_view_path = '{}.{}'.format(view.__module__, view.__name__)
+                if full_view_path in VIEW_BLACKLIST or view.__module__ in MODULE_BLACKLIST:
+                    continue
+
+                permissions, login_required, docstring = parser.parse(view)
+
+                views.append(ViewDetails._make([
+                    view.__module__,
+                    view.__name__,
+                    simplify_regex(base_url + str(pattern.pattern)),
+                    permissions,
+                    login_required,
+                    docstring
+                ]))
+
+        cache.set(cache_key, views, cache_timeout)
 
     return views

@@ -287,6 +287,6 @@ class UserPassesTestDecoratorProcessor(DecoratorProcessorTestCaseMixin, Processo
             test_views.user_passes_test_view,
             can_process=True,
             permissions=[],
-            login_required=False,
+            login_required=None,
             docstring='Custom user test'
         )

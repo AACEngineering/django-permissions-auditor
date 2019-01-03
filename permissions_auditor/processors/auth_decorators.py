@@ -6,6 +6,9 @@ from .base import BaseFuncViewProcessor
 
 
 class PermissionRequiredDecoratorProcessor(BaseFuncViewProcessor):
+    """
+    Process ``@permission_required()`` decorator on function based views.
+    """
 
     def can_process(self, view):
         if not super().can_process(view):
@@ -44,6 +47,9 @@ class PermissionRequiredDecoratorProcessor(BaseFuncViewProcessor):
 
 
 class LoginRequiredDecoratorProcessor(BaseFuncViewProcessor):
+    """
+    Process ``@login_required`` decorator on function based views.
+    """
 
     def can_process(self, view):
         if not super().can_process(view):
@@ -63,6 +69,9 @@ class LoginRequiredDecoratorProcessor(BaseFuncViewProcessor):
 
 
 class StaffMemberRequiredDecoratorProcessor(BaseFuncViewProcessor):
+    """
+    Process Django admin's ``@staff_member_required`` decorator on function based views.
+    """
 
     def can_process(self, view):
         if not super().can_process(view):
@@ -86,15 +95,7 @@ class StaffMemberRequiredDecoratorProcessor(BaseFuncViewProcessor):
 
 class ActiveUserRequiredDecoratorProcessor(BaseFuncViewProcessor):
     """
-    This isn't an actual decorator, but is common enough to merit a processor.
-
-    It detects this:
-
-    @user_passes_test(lambda u: u.is_active)
-
-
-    Note that this processor will process the @staff_member_required decorator
-    since it includes an is_active check.
+    Process ``@user_passes_test(lambda u: u.is_active)`` decorator on function based views.
     """
 
     def can_process(self, view):
@@ -119,11 +120,7 @@ class ActiveUserRequiredDecoratorProcessor(BaseFuncViewProcessor):
 
 class AnonymousUserRequiredDecoratorProcessor(BaseFuncViewProcessor):
     """
-    This isn't an actual decorator, but is common enough to merit a processor.
-
-    It detects this:
-
-    @user_passes_test(lambda u: u.is_anonymous)
+    Process ``@user_passes_test(lambda u: u.is_anonymous)`` decorator on function based views.
     """
 
     def can_process(self, view):
@@ -145,11 +142,7 @@ class AnonymousUserRequiredDecoratorProcessor(BaseFuncViewProcessor):
 
 class SuperUserRequiredDecoratorProcessor(BaseFuncViewProcessor):
     """
-    This isn't an actual decorator, but is common enough to merit a processor.
-
-    It detects this:
-
-    @user_passes_test(lambda u: u.is_superuser)
+    Process ``@user_passes_test(lambda u: u.is_superuser)`` decorator on function based views.
     """
 
     def can_process(self, view):
@@ -174,9 +167,13 @@ class SuperUserRequiredDecoratorProcessor(BaseFuncViewProcessor):
 
 class UserPassesTestDecoratorProcessor(BaseFuncViewProcessor):
     """
-    Note: the user_passes_test decorator does not automatically check
-    that the User is not anonymous. This means they don't necessarily need
-    to be authenticated for the check to pass.
+    Process ``@user_passes_test()`` decorator on function based views.
+
+    .. note::
+        the ``@user_passes_test`` decorator does not automatically check
+        that the User is not anonymous. This means they don't necessarily need
+        to be authenticated for the check to pass, so this processor returns
+        ``None`` (unknown) for the login_required attribute.
     """
 
     def can_process(self, view):
