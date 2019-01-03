@@ -11,6 +11,7 @@ setup(
     description='django-permissions-auditor is a tool to audit access control on your django app.',
     long_description=README,
     author='AAC Engineering',
+    url='https://github.com/AACEngineering/django-permissions-auditor',
     license='MIT',
     packages=find_packages(exclude=['example']),
     include_package_data=True,
