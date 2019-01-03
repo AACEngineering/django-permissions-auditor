@@ -1,5 +1,5 @@
 [flake8]
-exclude = .git,*/__pycache__/*,*/migrations/*,settings*.py
+exclude = .git,*/__pycache__/*,*/migrations/*,settings*.py,docs/*,*.tox/*
 max-line-length = 100
 
 # E12x continuation line indentation
