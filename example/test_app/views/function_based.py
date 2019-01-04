@@ -1,4 +1,4 @@
-from permissions_auditor.core import get_all_views
+from permissions_auditor.core import get_views
 
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import permission_required, user_passes_test
@@ -27,6 +27,6 @@ def superuser_index(request):
 @staff_member_required
 def permissions_index(request):
     context = {
-        'views': get_all_views()
+        'views': get_views()
     }
     return render(request, 'permissions_list.html', context)

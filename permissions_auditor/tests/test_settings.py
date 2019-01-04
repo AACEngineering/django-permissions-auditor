@@ -30,4 +30,4 @@ TEMPLATES = [
         },
     },
 ]
-ROOT_URLCONF = None
+ROOT_URLCONF = 'permissions_auditor.tests.fixtures.urls'

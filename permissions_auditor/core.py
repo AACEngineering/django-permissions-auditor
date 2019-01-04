@@ -82,9 +82,9 @@ class ViewParser:
         return permissions, login_required, '\n'.join(list(set(filter(None, docstrings))))
 
 
-def get_all_views(urlpatterns=None, base_url=''):
+def get_views(urlpatterns=None, base_url=''):
     """
-    Get all views in the specified urlpatterns.
+    Recursively fetch all views in the specified urlpatterns.
 
     If urlpatterns is not specified, uses the `PERMISSIONS_AUDITOR_ROOT_URLCONF`
     setting, which by default is the value of `ROOT_URLCONF` in your project settings.
@@ -100,8 +100,8 @@ def get_all_views(urlpatterns=None, base_url=''):
         views = []
 
         if urlpatterns is None:
-            root_urlconf = __import__(_get_setting('PERMISSIONS_AUDITOR_ROOT_URLCONF'))
-            urlpatterns = root_urlconf.urls.urlpatterns
+            root_urlconf = import_string(_get_setting('PERMISSIONS_AUDITOR_ROOT_URLCONF'))
+            urlpatterns = root_urlconf.urlpatterns
 
         parser = ViewParser()
 
@@ -112,7 +112,7 @@ def get_all_views(urlpatterns=None, base_url=''):
                     continue
 
                 # Recursively fetch patterns
-                views.extend(get_all_views(pattern.url_patterns, base_url + str(pattern.pattern)))
+                views.extend(get_views(pattern.url_patterns, base_url + str(pattern.pattern)))
 
             elif isinstance(pattern, URLPattern) or isinstance(pattern, RegexPattern):
                 view = pattern.callback

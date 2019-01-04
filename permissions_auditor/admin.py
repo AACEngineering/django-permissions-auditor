@@ -6,7 +6,7 @@ from django.template.response import TemplateResponse
 from django.urls import path
 from django.utils.translation import gettext_lazy as _
 
-from permissions_auditor.core import get_all_views, _get_setting
+from permissions_auditor.core import get_views, _get_setting
 from permissions_auditor.forms import AuditorAdminPermissionForm
 
 
@@ -56,7 +56,7 @@ class ViewIndex(admin.ModelAdmin):
         context = dict(self.admin_site.each_context(request))
 
         context.update({
-            'views': get_all_views(),
+            'views': get_views(),
             'group_by': request.GET.get('group_by', 'module')
         })
         return TemplateResponse(request, "permissions_auditor/admin/views_index.html", context)
@@ -84,7 +84,7 @@ class ViewIndex(admin.ModelAdmin):
             'errors': helpers.AdminErrorList(adminForm.form, []),
             'media': media,
 
-            'views': get_all_views(),
+            'views': get_views(),
             'permission': '{}.{}'.format(obj.content_type.app_label, obj.codename),
 
             'opts': opts,

@@ -1,4 +1,4 @@
-from permissions_auditor.core import get_all_views
+from permissions_auditor.core import get_views
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
@@ -41,5 +41,5 @@ class PermissionsIndex(PermissionRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['views'] = get_all_views()
+        context['views'] = get_views()
         return context
