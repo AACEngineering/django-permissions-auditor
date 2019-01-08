@@ -7,6 +7,9 @@ django-permissions-auditor
 [![](https://readthedocs.org/projects/django-permissions-auditor/badge/?version=latest&style=flat)](https://django-permissions-auditor.readthedocs.io/en/latest/)
 
 
+https://django-permissions-auditor.readthedocs.io/en/latest/
+
+
 Admin site for auditing and managing permissions for views in your Django app.
 
 

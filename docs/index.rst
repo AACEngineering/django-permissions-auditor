@@ -45,3 +45,4 @@ The project is licensed under the MIT license.
    example
    processors/index
    custom_processors
+   changelog
