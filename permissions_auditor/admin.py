@@ -63,6 +63,9 @@ class ViewIndex(admin.ModelAdmin):
 
     def permission_detail(self, request, permission, obj=None):
         obj = self.get_object(request, permission)
+        if obj is None:
+            return self._get_obj_does_not_exist_redirect(request, self.model._meta, permission)
+
         opts = self.model._meta
 
         adminForm = helpers.AdminForm(
