@@ -71,8 +71,10 @@ class BaseCBVProcessor(BaseProcessor):
 class BaseFileredMixinProcessor(BaseCBVProcessor):
     """
     Base class for parsing mixins on class based views.
-    Set `class_filter` to filter the class names the processor applies to.
+    Set ``class_filter`` to filter the class names the processor applies to.
     ONLY checks top level base classes.
+
+    :var class_filter: initial value: ``None``
     """
     class_filter = None
 
@@ -82,17 +84,18 @@ class BaseFileredMixinProcessor(BaseCBVProcessor):
 
         view_bases = [cls.__module__ + '.' + cls.__name__ for cls in view.__bases__]
 
-        for cls_filter in self.get_class_filter(view):
+        for cls_filter in self.get_class_filter():
             if cls_filter in view_bases:
                 return True
 
         return False
 
-    def get_class_filter(self, view):
+    def get_class_filter(self):
         """
         Override this method to override the class_names attribute.
         Must return an iterable.
 
+        :return: a list of strings containing the full paths of mixins to detect.
         :raises ImproperlyConfigured: if the ``class_filter`` atribute is ``None``.
         """
         if self.class_filter is None:

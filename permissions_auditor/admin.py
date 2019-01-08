@@ -73,7 +73,9 @@ class ViewIndex(admin.ModelAdmin):
         )
         media = self.media + adminForm.media
 
-        if request.method == 'POST' and adminForm.form.is_valid():
+        if (request.method == 'POST' and
+                adminForm.form.is_valid() and
+                self.has_auditor_change_permission(request)):
             obj.user_set.set(adminForm.form.cleaned_data['users'])
             obj.group_set.set(adminForm.form.cleaned_data['groups'])
             return self.response_change(request, obj)
@@ -95,9 +97,7 @@ class ViewIndex(admin.ModelAdmin):
             'has_editable_inline_admin_formsets': False,
             'has_view_permission': self.has_view_permission(request, obj),
             'has_add_permission': self.has_add_permission(request, obj),
-            'has_change_permission': request.user.has_perms(
-                ['auth.change_user', 'auth.change_group']
-            ),
+            'has_change_permission': self.has_auditor_change_permission(request),
             'has_delete_permission': self.has_delete_permission(request, obj),
             'app_label': opts.app_label,
         }
@@ -117,6 +117,9 @@ class ViewIndex(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+    def has_auditor_change_permission(self, request):
+        return request.user.has_perms(['auth.change_user', 'auth.change_group'])
 
 
 if _get_setting('PERMISSIONS_AUDITOR_ADMIN'):

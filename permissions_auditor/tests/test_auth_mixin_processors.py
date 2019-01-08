@@ -75,6 +75,18 @@ class TestPermissionRequiredMixinProcessor(MixinProcessorTestCaseMixin, Processo
             docstring=None
         )
 
+    def test_cb_permissionsrequiredview_no_perm(self):
+        """
+        Views that override has_permission() and do not set permission_required should be processed.
+        """
+        self.assertProcessorResults(
+            views.PermissionRequiredViewNoPerm,
+            can_process=True,
+            permissions=[],
+            login_required=True,
+            docstring='The user\'s first name must be Bob'
+        )
+
     def test_cb_permissionsrequiredview_docstring(self):
         """Views that implement has_permission() and have a docstring should be retrieved."""
         self.assertProcessorResults(

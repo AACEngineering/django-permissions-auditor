@@ -64,7 +64,7 @@ class BaseFilteredMixinProcessorTest(ProcessorTestCase):
         """
         self.processor.class_filter = None
 
-        def filter_func(view):
+        def filter_func():
             return ('django.contrib.auth.mixins.LoginRequiredMixin',)
 
         with patch.object(self.processor, 'get_class_filter', filter_func):

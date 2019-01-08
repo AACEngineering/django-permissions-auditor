@@ -28,6 +28,13 @@ class PermissionRequiredMultiView(PermissionRequiredMixin, View):
     permission_required = ('tests.test_perm', 'tests.test_perm2')
 
 
+class PermissionRequiredViewNoPerm(PermissionRequiredMixin, View):
+
+    def has_permission(self):
+        """The user's first name must be Bob"""
+        return self.request.user.first_name == 'Bob'
+
+
 class PermissionRequiredViewDocstring(PermissionRequiredMixin, View):
     permission_required = 'tests.test_perm'
 

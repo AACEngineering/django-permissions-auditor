@@ -2,6 +2,8 @@
 
 import inspect
 
+from django.conf import ImproperlyConfigured
+
 from .base import BaseFileredMixinProcessor
 
 
@@ -18,7 +20,10 @@ class PermissionRequiredMixinProcessor(BaseFileredMixinProcessor):
     class_filter = 'django.contrib.auth.mixins.PermissionRequiredMixin'
 
     def get_permission_required(self, view):
-        return view().get_permission_required()
+        try:
+            return view().get_permission_required()
+        except ImproperlyConfigured:
+            return []
 
     def get_login_required(self, view):
         return True
