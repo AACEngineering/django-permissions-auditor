@@ -1,7 +1,7 @@
 .. _processors:
 
-Processors
-===========
+Included Processors
+===================
 
 Processors are what do the work of parsing the permissions out of a view.
 

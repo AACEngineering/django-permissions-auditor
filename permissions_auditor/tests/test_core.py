@@ -81,6 +81,10 @@ class GetViewsTest(SimpleTestCase):
         ]
 
     def reload_blacklist(self):
+        """
+        The blacklist is loaded when the app starts, we need to override the values
+        when we change settings.
+        """
         core.NAMESPACE_BLACKLIST = tuple(core._get_blacklist('namespaces'))
         core.VIEW_BLACKLIST = tuple(core._get_blacklist('view_names'))
         core.MODULE_BLACKLIST = tuple(core._get_blacklist('modules'))

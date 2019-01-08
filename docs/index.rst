@@ -40,5 +40,8 @@ The project is licensed under the MIT license.
 
    overview
    installation
-   configuration
+   settings
+   admin_site
    processors/index
+   custom_processors
+   example

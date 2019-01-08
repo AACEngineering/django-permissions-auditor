@@ -26,9 +26,9 @@ class BaseFuncViewProcessorTest(ProcessorTestCase):
         self.assertProcessorResults(views.base_view, can_process=True)
 
 
-class BaseMixinProcessorTest(ProcessorTestCase):
+class BaseCBVProcessorTest(ProcessorTestCase):
     def setUp(self):
-        self.processor = base.BaseMixinProcessor()
+        self.processor = base.BaseCBVProcessor()
 
     def test_can_process_class(self):
         self.assertProcessorResults(views.BaseView, can_process=True)

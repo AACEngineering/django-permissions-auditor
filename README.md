@@ -14,3 +14,6 @@ Admin site for auditing and managing permissions for views in your Django app.
 
 
 Automatically parse Django views in your project and pull out the permissions required to view them. Easily extensible to work with custom permission schemes.
+
+
+![Screenshot](docs/img/admin_permissions.png?raw=true "Screenshot")

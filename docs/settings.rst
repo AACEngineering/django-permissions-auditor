@@ -1,4 +1,4 @@
-Configuration
+Settings
 ==================
 
 
@@ -80,7 +80,7 @@ PERMISSIONS_AUDITOR_CACHE_KEY
 
 The cache key prefix to use when caching processed views results.
 
-Default: ``'permissions_auditor_views_cache'``
+Default: ``'permissions_auditor_views'``
 
 
 

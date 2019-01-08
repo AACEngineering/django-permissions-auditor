@@ -1,6 +1,7 @@
 Django Auth Mixin Processors
 ============================
 
+.. _PermissionRequiredMixinProcessor:
 
 PermissionRequiredMixinProcessor
 ------------------------------------------

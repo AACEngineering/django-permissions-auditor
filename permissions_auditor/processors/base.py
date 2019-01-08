@@ -8,20 +8,36 @@ class BaseProcessor:
     def can_process(self, view):
         """
         Can this processor process the provided view?
-        Useful when implementing filtering.
+
+        :param view: the view being processed.
+        :type view: function or class
+        :return: whether this processor can process the view.
+                 Default: ``False``
+        :rtype: boolean
         """
         return True
 
     def get_permission_required(self, view):
         """
-        Return the permissions required on the provided view.
+        Get the permissions required on the provided view.
         Must return an iterable.
+
+        :param view: the view being processed.
+        :type view: function or class
+        :return: the permissions required to access the view. Default: ``[]``
+        :rtype: list(str)
         """
         return []
 
     def get_login_required(self, view):
         """
-        Return True if the provided view requires the user to be loged in.
+        Get whether or not the view needs the user to be logged in to access.
+
+        :param view: the view being processed.
+        :type view: function or class
+        :return: whether a user must be logged in to access this view.
+                 Default: ``False``
+        :rtype: boolean or None (if unknown)
         """
         return False
 
@@ -29,28 +45,33 @@ class BaseProcessor:
         """
         Return any additional information that should be displayed when
         showing permisison information.
+
+        :param view: the view being processed.
+        :type view: function or class
+        :return: the string to display in the additional info column. Default: ``None``
+        :rtype: str or None
         """
         return None
 
 
 class BaseFuncViewProcessor(BaseProcessor):
-    """Base class for function based views."""
+    """Base class for processing function based views."""
 
     def can_process(self, view):
         return inspect.isfunction(view)
 
 
-class BaseMixinProcessor(BaseProcessor):
-    """Base class for parsing mixins on class based views."""
+class BaseCBVProcessor(BaseProcessor):
+    """Base class for processing class based views."""
 
     def can_process(self, view):
         return inspect.isclass(view)
 
 
-class BaseFileredMixinProcessor(BaseMixinProcessor):
+class BaseFileredMixinProcessor(BaseCBVProcessor):
     """
     Base class for parsing mixins on class based views.
-    Override `class_filter` to filter the class names the processor applies to.
+    Set `class_filter` to filter the class names the processor applies to.
     ONLY checks top level base classes.
     """
     class_filter = None
@@ -71,6 +92,8 @@ class BaseFileredMixinProcessor(BaseMixinProcessor):
         """
         Override this method to override the class_names attribute.
         Must return an iterable.
+
+        :raises ImproperlyConfigured: if the ``class_filter`` atribute is ``None``.
         """
         if self.class_filter is None:
             raise ImproperlyConfigured(

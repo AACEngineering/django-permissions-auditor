@@ -12,7 +12,7 @@ class PermissionRequiredMixinProcessor(BaseFileredMixinProcessor):
 
     .. hint::
         If the ``has_permission()`` function is overridden, any docstrings on that
-        function will be pulled and displayed in the additional info column.
+        function will be displayed in the additional info column.
     """
 
     class_filter = 'django.contrib.auth.mixins.PermissionRequiredMixin'
@@ -55,7 +55,7 @@ class UserPassesTestMixinProcessor(BaseFileredMixinProcessor):
 
     .. hint::
         If the function returned by ``get_test_func()`` is overridden, any docstrings
-        on that function will be pulled and displayed in the additional info column.
+        on that function will be displayed in the additional info column.
 
     .. note::
         UserPassesTestMixinProcessor does not automatically check
