@@ -12,7 +12,7 @@ class AuditorAdminPermissionForm(forms.ModelForm):
     codename = forms.CharField(disabled=True)
     users = forms.ModelMultipleChoiceField(
         widget=widgets.FilteredSelectMultiple("User", is_stacked=False),
-        queryset=User.objects.all(),
+        queryset=User.objects.filter(is_active=True),
         required=False,
     )
     groups = forms.ModelMultipleChoiceField(

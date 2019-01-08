@@ -47,7 +47,7 @@ class ViewIndex(admin.ModelAdmin):
 
     def get_form(self, request, obj, change=False, **kwargs):
         defaults = {
-            'users': obj.user_set.all(),
+            'users': obj.user_set.filter(is_active=True),
             'groups': obj.group_set.all()
         }
         return self.form(request.POST or defaults, instance=obj)

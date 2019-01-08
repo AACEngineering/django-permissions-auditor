@@ -11,5 +11,7 @@ class PermissionsAuditorConfig(AppConfig):
 
     def ready(self):
         # Delete the cached views list on application reload.
-        cache_key = _get_setting('PERMISSIONS_AUDITOR_CACHE_KEY')
-        cache.delete(cache_key)
+        cache.delete_many([
+            _get_setting('PERMISSIONS_AUDITOR_CACHE_KEY'),
+            _get_setting('PERMISSIONS_AUDITOR_CACHE_KEY') + '_BASE_URL',
+        ])

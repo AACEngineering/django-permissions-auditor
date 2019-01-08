@@ -24,11 +24,6 @@ def _get_blacklist(name):
     return blacklist[name]
 
 
-def _get_cache_key(base_url):
-    prefix = _get_setting('PERMISSIONS_AUDITOR_CACHE_KEY')
-    return '{}.{}'.format(prefix, base_url)
-
-
 NAMESPACE_BLACKLIST = tuple(_get_blacklist('namespaces'))
 VIEW_BLACKLIST = tuple(_get_blacklist('view_names'))
 MODULE_BLACKLIST = tuple(_get_blacklist('modules'))
@@ -82,7 +77,7 @@ class ViewParser:
         return permissions, login_required, '\n'.join(list(set(filter(None, docstrings))))
 
 
-def get_views(urlpatterns=None, base_url=''):
+def _get_views(urlpatterns=None, base_url=''):
     """
     Recursively fetch all views in the specified urlpatterns.
 
@@ -91,50 +86,64 @@ def get_views(urlpatterns=None, base_url=''):
 
     Returns a list of `View` namedtuples.
     """
-    cache_key = _get_cache_key(base_url)
+    views = []
+
+    if urlpatterns is None:
+        root_urlconf = import_string(_get_setting('PERMISSIONS_AUDITOR_ROOT_URLCONF'))
+        urlpatterns = root_urlconf.urlpatterns
+
+    parser = ViewParser()
+
+    for pattern in urlpatterns:
+        if isinstance(pattern, RoutePattern) or isinstance(pattern, URLResolver):
+
+            if pattern.namespace in NAMESPACE_BLACKLIST:
+                continue
+
+            # Recursively fetch patterns
+            views.extend(_get_views(pattern.url_patterns, base_url + str(pattern.pattern)))
+
+        elif isinstance(pattern, URLPattern) or isinstance(pattern, RegexPattern):
+            view = pattern.callback
+
+            # If this is a CBV, use the actual class instead of the as_view() classmethod.
+            view = getattr(view, 'view_class', view)
+
+            full_view_path = '{}.{}'.format(view.__module__, view.__name__)
+            if full_view_path in VIEW_BLACKLIST or view.__module__ in MODULE_BLACKLIST:
+                continue
+
+            permissions, login_required, docstring = parser.parse(view)
+
+            views.append(ViewDetails._make([
+                view.__module__,
+                view.__name__,
+                simplify_regex(base_url + str(pattern.pattern)),
+                permissions,
+                login_required,
+                docstring
+            ]))
+
+    return views
+
+
+def get_views(urlpatterns=None, base_url=''):
+    """
+    Get a cached version of _get_views().
+    """
+    cache_key = _get_setting('PERMISSIONS_AUDITOR_CACHE_KEY')
+    cache_base_url_key = cache_key + '_BASE_URL'
     cache_timeout = _get_setting('PERMISSIONS_AUDITOR_CACHE_TIMEOUT')
 
-    views = cache.get(cache_key)
+    cache_content = cache.get_many([cache_key, cache_base_url_key])
+    views = cache_content.get(cache_key, None)
+    cached_base_url = cache_content.get(cache_base_url_key, None)
 
-    if views is None:
-        views = []
-
-        if urlpatterns is None:
-            root_urlconf = import_string(_get_setting('PERMISSIONS_AUDITOR_ROOT_URLCONF'))
-            urlpatterns = root_urlconf.urlpatterns
-
-        parser = ViewParser()
-
-        for pattern in urlpatterns:
-            if isinstance(pattern, RoutePattern) or isinstance(pattern, URLResolver):
-
-                if pattern.namespace in NAMESPACE_BLACKLIST:
-                    continue
-
-                # Recursively fetch patterns
-                views.extend(get_views(pattern.url_patterns, base_url + str(pattern.pattern)))
-
-            elif isinstance(pattern, URLPattern) or isinstance(pattern, RegexPattern):
-                view = pattern.callback
-
-                # If this is a CBV, use the actual class instead of the as_view() classmethod.
-                view = getattr(view, 'view_class', view)
-
-                full_view_path = '{}.{}'.format(view.__module__, view.__name__)
-                if full_view_path in VIEW_BLACKLIST or view.__module__ in MODULE_BLACKLIST:
-                    continue
-
-                permissions, login_required, docstring = parser.parse(view)
-
-                views.append(ViewDetails._make([
-                    view.__module__,
-                    view.__name__,
-                    simplify_regex(base_url + str(pattern.pattern)),
-                    permissions,
-                    login_required,
-                    docstring
-                ]))
-
-        cache.set(cache_key, views, cache_timeout)
+    if views is None or cached_base_url != base_url:
+        views = _get_views(urlpatterns, base_url)
+        cache.set_many({
+            cache_key: views,
+            cache_base_url_key: base_url
+        }, timeout=cache_timeout)
 
     return views
