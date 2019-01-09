@@ -82,7 +82,7 @@
                                 <img src="{% static 'admin/img/icon-no.svg' %}" alt="no">
                             {% endif %}
                         </td>
-                        <td class="field-additional_info">{{ view.docstring|linebreaks }}</td>
+                        <td class="field-additional_info">{{ view.docstring|safe|linebreaks }}</td>
                     </tr>
                     {% endfor %}{% resetcycle %}
                 {% endif %}

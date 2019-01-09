@@ -46,10 +46,10 @@ class ViewParser:
             try:
                 processor = import_string(processor_path)
                 self._processors.append(processor())
-            except (ImportError, TypeError):
+            except (ImportError, TypeError) as ex:
                 raise ImproperlyConfigured(
                     '{} is not a valid permissions processor.'.format(processor_path)
-                )
+                ) from ex
 
     def parse(self, view):
         """
