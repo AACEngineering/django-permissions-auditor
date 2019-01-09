@@ -1,7 +1,7 @@
 Changelog
 =========
 
-v0.3.2 (Unreleased)
+v0.3.3 (Released 1/9/2019)
 --------------------------
 
 - Mark docstrings as safe in admin templates
@@ -9,7 +9,7 @@ v0.3.2 (Unreleased)
 - Fix Django admin module permissions check
 
 
-v0.3.1 (Released 1/9/2019)
+v0.3.2 (Released 1/9/2019)
 --------------------------
 
 - Fix various cache issues
