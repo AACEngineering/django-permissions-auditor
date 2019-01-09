@@ -121,6 +121,9 @@ class ViewIndex(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
+    def has_module_permission(self, request):
+        return request.user.is_staff
+
     def has_auditor_change_permission(self, request):
         return request.user.has_perms(['auth.change_user', 'auth.change_group'])
 

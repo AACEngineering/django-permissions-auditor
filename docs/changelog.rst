@@ -6,6 +6,7 @@ v0.3.2 (Unreleased)
 
 - Mark docstrings as safe in admin templates
 - No longer suppress inner exceptions when parsing processors
+- Fix Django admin module permissions check
 
 
 v0.3.1 (Released 1/9/2019)
