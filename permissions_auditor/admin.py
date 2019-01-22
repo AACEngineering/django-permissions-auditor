@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.admin import helpers
 from django.contrib.auth.admin import GroupAdmin
-from django.contrib.auth.models import Group, Permission
+from django.contrib.auth.models import Group as DjangoGroupModel, Permission
 from django.db import models
 from django.template.response import TemplateResponse
 from django.urls import path, reverse
@@ -17,6 +17,13 @@ class View(models.Model):
     class Meta:
         verbose_name = 'permission'
         verbose_name_plural = _('Site Views')
+        app_label = 'permissions_auditor'
+
+
+class Group(DjangoGroupModel):
+    """Proxy model to display groups page in the admin."""
+    class Meta:
+        proxy = True
         app_label = 'permissions_auditor'
 
 
@@ -161,19 +168,6 @@ class AuditorGroupAdmin(GroupAdmin):
         return qs.prefetch_related('permissions', 'permissions__content_type', 'user_set')
 
 
-# https://stackoverflow.com/a/2228821
-def create_modeladmin(modeladmin, model, name=None):
-    class Meta:
-        proxy = True
-        app_label = 'permissions_auditor'
-
-    attrs = {'__module__': '', 'Meta': Meta}
-    newmodel = type(name, (model,), attrs)
-
-    admin.site.register(newmodel, modeladmin)
-    return modeladmin
-
-
 if _get_setting('PERMISSIONS_AUDITOR_ADMIN'):
     admin.site.register(View, ViewsIndexAdmin)
-    create_modeladmin(AuditorGroupAdmin, Group, 'Group')
+    admin.site.register(Group, AuditorGroupAdmin)
