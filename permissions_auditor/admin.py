@@ -167,6 +167,21 @@ class AuditorGroupAdmin(GroupAdmin):
         qs = super().get_queryset(request)
         return qs.prefetch_related('permissions', 'permissions__content_type', 'user_set')
 
+    def has_view_permission(self, request, obj=None):
+        return request.user.has_perm('auth.view_group')
+
+    def has_add_permission(self, request, obj=None):
+        return request.user.has_perm('auth.add_group')
+
+    def has_change_permission(self, request, obj=None):
+        return request.user.has_perm('auth.change_group')
+
+    def has_delete_permission(self, request, obj=None):
+        return request.user.has_perm('auth.delete_group')
+
+    def has_module_permission(self, request):
+        return self.has_view_permission(request) or self.has_change_permission(request)
+
 
 if _get_setting('PERMISSIONS_AUDITOR_ADMIN'):
     admin.site.register(View, ViewsIndexAdmin)
