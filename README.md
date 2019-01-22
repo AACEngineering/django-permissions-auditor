@@ -13,7 +13,7 @@ https://django-permissions-auditor.readthedocs.io/en/latest/
 Admin site for auditing and managing permissions for views in your Django app.
 
 
-![Screenshot](docs/img/admin_index.png?raw=true "Screenshot")
+![Screenshot](docs/img/admin_views.png?raw=true "Screenshot")
 
 
 Automatically parse Django views in your project and pull out the permissions required to view them. Easily extensible to work with custom permission schemes.

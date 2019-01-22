@@ -1,6 +1,12 @@
 Changelog
 =========
 
+v0.4.0 (Released 1/22/2019)
+---------------------------
+
+- Add groups listing to admin site
+
+
 v0.3.3 (Released 1/9/2019)
 --------------------------
 

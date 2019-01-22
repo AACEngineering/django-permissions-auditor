@@ -27,7 +27,6 @@
 <div class="breadcrumbs">
 <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
 &rsaquo; <a href="{% url 'admin:app_list' app_label='permissions_auditor' %}">{% trans 'Permissions Auditor' %}</a>
-&rsaquo; <a href="{% url 'admin:permissions_auditor_view_changelist' %}">{% trans 'Site Views' %}</a>
 &rsaquo; {{ permission }}
 </div>
 {% endblock %}

@@ -8,7 +8,7 @@ django-permissions-auditor
 Admin site for auditing and managing permissions for views in your Django app.
 
 
-.. image:: img/admin_index.png
+.. image:: img/admin_views.png
 
 
 Features
