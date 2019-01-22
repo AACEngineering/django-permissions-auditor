@@ -1,24 +1,50 @@
 from django.contrib import admin
 from django.contrib.admin import helpers
-from django.contrib.auth.models import Permission
+from django.contrib.auth.admin import GroupAdmin
+from django.contrib.auth.models import Group as DjangoGroupModel, Permission
 from django.db import models
 from django.template.response import TemplateResponse
-from django.urls import path
+from django.urls import path, reverse
+from django.utils.html import mark_safe
 from django.utils.translation import gettext_lazy as _
 
 from permissions_auditor.core import get_views, _get_setting
 from permissions_auditor.forms import AuditorAdminPermissionForm
 
 
-class Index(models.Model):
-    """Dummy model to display our pages in the admin."""
+class View(models.Model):
+    """Dummy model to display views index pages in the admin."""
     class Meta:
         verbose_name = 'permission'
-        verbose_name_plural = _('Site Views Index')
+        verbose_name_plural = _('Site Views')
         app_label = 'permissions_auditor'
 
 
-class ViewIndex(admin.ModelAdmin):
+class Group(DjangoGroupModel):
+    """Proxy model to display groups page in the admin."""
+    class Meta:
+        proxy = True
+        app_label = 'permissions_auditor'
+
+
+def create_modeladmin(modeladmin, model, name=None):
+    class Meta:
+        proxy = True
+        app_label = model._meta.app_label
+
+    attrs = {'__module__': '', 'Meta': Meta}
+
+    newmodel = type(name, (model,), attrs)
+
+    admin.site.register(newmodel, modeladmin)
+    return modeladmin
+
+
+class ViewsIndexAdmin(admin.ModelAdmin):
+    """
+    Index containing all of the views found on the django site,
+    and the permissions needed to access them.
+    """
     form = AuditorAdminPermissionForm
     fieldsets = (
         (_('Permission Info'), {
@@ -122,11 +148,39 @@ class ViewIndex(admin.ModelAdmin):
         return False
 
     def has_module_permission(self, request):
-        return request.user.is_staff
+        return self.has_view_permission(request)
 
     def has_auditor_change_permission(self, request):
         return request.user.has_perms(['auth.change_user', 'auth.change_group'])
 
 
+class AuditorGroupAdmin(GroupAdmin):
+    list_display = ['name', 'permissions_display', 'users_display']
+
+    def permissions_display(self, obj):
+        result = ''
+        for perm in obj.permissions.all():
+            perm_str = '{}.{}'.format(perm.content_type.app_label, perm.codename)
+            url = reverse('admin:permissions_auditor_view_permissiondetail', args=(perm_str,))
+            result += '<a href="{}">{}</a><br/>'.format(url, perm_str)
+        return mark_safe(result)
+
+    permissions_display.short_description = 'Permissions'
+
+    def users_display(self, obj):
+        result = ''
+        for user in obj.user_set.filter(is_active=True):
+            url = reverse('admin:auth_user_change', args=(user.pk,))
+            result += '<a href="{}">{}</a><br/>'.format(url, user)
+        return mark_safe(result)
+
+    users_display.short_description = 'Active Users'
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.prefetch_related('permissions', 'permissions__content_type', 'user_set')
+
+
 if _get_setting('PERMISSIONS_AUDITOR_ADMIN'):
-    admin.site.register(Index, ViewIndex)
+    admin.site.register(View, ViewsIndexAdmin)
+    admin.site.register(Group, AuditorGroupAdmin)

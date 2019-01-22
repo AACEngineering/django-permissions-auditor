@@ -17,12 +17,13 @@
     </style>
 {% endblock %}
 
-{% block title %}{% trans 'Permissions Auditor' %} | {% trans 'Django site admin' %}{% endblock %}
+{% block title %}{% trans 'Permissions Auditor Views' %} | {% trans 'Django site admin' %}{% endblock %}
 
 {% block breadcrumbs %}
 <div class="breadcrumbs">
 <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
-&rsaquo; {% trans 'Permissions Auditor' %}
+&rsaquo; <a href="{% url 'admin:app_list' app_label='permissions_auditor' %}">{% trans 'Permissions Auditor' %}</a>
+&rsaquo; {% trans 'Site Views' %}
 </div>
 {% endblock %}
 
@@ -124,7 +125,7 @@
                             <td><i>{{ view.url }}</i></td>
                             <td>
                                 {% for permission in view.permissions %}
-                                    <a href="{% url 'admin:permissions_auditor_index_permissiondetail' permission %}">
+                                    <a href="{% url 'admin:permissions_auditor_view_permissiondetail' permission %}">
                                         {{ permission }}
                                     </a><br>
                                 {% endfor %}
