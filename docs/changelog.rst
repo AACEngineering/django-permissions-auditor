@@ -1,7 +1,13 @@
 Changelog
 =========
 
-v0.4.0 (Released 1/22/2019)
+v0.4.1 (Released 1/22/2019)
+---------------------------
+
+- Hotfix for auth migrations issue
+
+
+v0.4.0 (Release Removed)
 ---------------------------
 
 - Add groups listing to admin site
