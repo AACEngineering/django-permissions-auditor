@@ -1,6 +1,6 @@
 "Permissions auditing for Django."
 
-__version__ = '0.4.1'
+__version__ = '0.4.2'
 
 
 default_app_config = 'permissions_auditor.apps.PermissionsAuditorConfig'

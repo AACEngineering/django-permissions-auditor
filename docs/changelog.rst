@@ -1,6 +1,13 @@
 Changelog
 =========
 
+v0.4.2 (Released 1/23/2019)
+---------------------------
+
+- Fix permission check for groups listing (uses the default Django 'auth.change_group', 'auth.view_group')
+- Fix N+1 query in groups listing
+
+
 v0.4.1 (Released 1/22/2019)
 ---------------------------
 
