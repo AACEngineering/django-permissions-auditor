@@ -1,8 +1,10 @@
 from django.contrib import admin
 from django.contrib.admin import helpers
+from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import GroupAdmin
 from django.contrib.auth.models import Group as DjangoGroupModel, Permission
 from django.db import models
+from django.db.models import Prefetch
 from django.template.response import TemplateResponse
 from django.urls import path, reverse
 from django.utils.html import mark_safe
@@ -156,7 +158,7 @@ class AuditorGroupAdmin(GroupAdmin):
 
     def users_display(self, obj):
         result = ''
-        for user in obj.user_set.filter(is_active=True):
+        for user in obj.active_users:
             url = reverse('admin:auth_user_change', args=(user.pk,))
             result += '<a href="{}">{}</a><br/>'.format(url, user)
         return mark_safe(result)
@@ -165,7 +167,15 @@ class AuditorGroupAdmin(GroupAdmin):
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
-        return qs.prefetch_related('permissions', 'permissions__content_type', 'user_set')
+        return qs.prefetch_related(
+            'permissions',
+            'permissions__content_type',
+            Prefetch(
+                'user_set',
+                queryset=get_user_model().objects.filter(is_active=True),
+                to_attr='active_users'
+            )
+        )
 
     def has_view_permission(self, request, obj=None):
         return request.user.has_perm('auth.view_group')
