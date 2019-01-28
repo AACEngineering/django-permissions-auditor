@@ -17,6 +17,7 @@ from permissions_auditor.forms import AuditorAdminPermissionForm
 class View(models.Model):
     """Dummy model to display views index pages in the admin."""
     class Meta:
+        managed = False
         verbose_name = 'permission'
         verbose_name_plural = _('Site Views')
         app_label = 'permissions_auditor'
@@ -26,6 +27,7 @@ class Group(DjangoGroupModel):
     """Proxy model to display groups page in the admin."""
     class Meta:
         proxy = True
+        managed = False
         app_label = 'permissions_auditor'
 
 

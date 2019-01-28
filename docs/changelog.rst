@@ -1,6 +1,12 @@
 Changelog
 =========
 
+v0.4.3 (Released 1/28/2019)
+---------------------------
+
+- Prevent the app from creating migrations
+
+
 v0.4.2 (Released 1/23/2019)
 ---------------------------
 
