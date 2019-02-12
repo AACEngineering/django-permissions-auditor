@@ -29,9 +29,6 @@ class Command(BaseCommand):
             if permission not in db_permissions:
                 missing_perms.append(permission)
 
-
-        print(missing_perms)
-
         if missing_perms:
             for permission in missing_perms:
                 self.stdout.write(self.style.WARNING(
