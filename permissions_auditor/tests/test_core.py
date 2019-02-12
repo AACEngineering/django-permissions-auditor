@@ -54,6 +54,12 @@ class GetViewsTest(SimpleTestCase):
                 permissions=[], login_required=False, docstring=''
             ),
             ViewDetails(
+                module=self.module, name='PermissionRequiredMultiView',
+                url='/multi_perm_view/',
+                permissions=['tests.test_perm', 'tests.test_perm2'],
+                login_required=True, docstring=''
+            ),
+            ViewDetails(
                 module=self.module, name='login_required_view',
                 url='/new_style/login_required/',
                 permissions=[], login_required=True, docstring=''

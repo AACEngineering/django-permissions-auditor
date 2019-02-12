@@ -1,6 +1,13 @@
 Changelog
 =========
 
+v0.5 (Release TBD)
+------------------
+
+- Override the django groups admin list instead of creating a custom one (this can be configured via ``PERMISSIONS_AUDITOR_ADMIN_OVERRIDE_GROUPS`` setting.)
+- Add ``check_view_permissions`` management command.
+
+
 v0.4.3 (Released 1/28/2019)
 ---------------------------
 

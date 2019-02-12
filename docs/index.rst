@@ -42,6 +42,7 @@ The project is licensed under the MIT license.
    installation
    settings
    admin_site
+   management_commands
    example
    processors/index
    custom_processors

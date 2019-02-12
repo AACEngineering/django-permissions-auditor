@@ -53,5 +53,5 @@ without viewing each group individually.
 .. image:: img/admin_groups.png
 
 
-Django-permissions-auditor implements a groups list containing the assigned permissions and active
-users.
+Django-permissions-auditor overrides the default groups admin list to show the assigned permissions 
+and active users. This behavior can be disabled via the :ref:`PERMISSIONS_AUDITOR_ADMIN_OVERRIDE_GROUPS` setting.

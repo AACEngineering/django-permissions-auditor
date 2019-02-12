@@ -62,6 +62,18 @@ Default: ``TRUE``
 
 
 
+.. _PERMISSIONS_AUDITOR_ADMIN_OVERRIDE_GROUPS:
+
+PERMISSIONS_AUDITOR_ADMIN_OVERRIDE_GROUPS
+-----------------------------------------
+
+Override the default django groups admin with the permissions auditor version. Has no effect if
+:ref:`PERMISSIONS_AUDITOR_ADMIN` is set to ``False``.
+
+Default: ``True``
+
+
+
 .. _PERMISSIONS_AUDITOR_ROOT_URLCONF:
 
 PERMISSIONS_AUDITOR_ROOT_URLCONF

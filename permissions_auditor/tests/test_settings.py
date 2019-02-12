@@ -4,6 +4,11 @@ CACHES = {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
     }
 }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3'
+    }
+}
 MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',

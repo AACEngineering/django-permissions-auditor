@@ -30,3 +30,8 @@ def permissions_index(request):
         'views': get_views()
     }
     return render(request, 'permissions_list.html', context)
+
+
+@permission_required('perm.does_not_exist')
+def invalid_permission_view(request):
+    return render(request, 'base.html', {})

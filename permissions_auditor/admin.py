@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.admin import helpers
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import GroupAdmin
-from django.contrib.auth.models import Group as DjangoGroupModel, Permission
+from django.contrib.auth.models import Group, Permission
 from django.db import models
 from django.db.models import Prefetch
 from django.template.response import TemplateResponse
@@ -20,14 +20,6 @@ class View(models.Model):
         managed = False
         verbose_name = 'permission'
         verbose_name_plural = _('Site Views')
-        app_label = 'permissions_auditor'
-
-
-class Group(DjangoGroupModel):
-    """Proxy model to display groups page in the admin."""
-    class Meta:
-        proxy = True
-        managed = False
         app_label = 'permissions_auditor'
 
 
@@ -179,22 +171,10 @@ class AuditorGroupAdmin(GroupAdmin):
             )
         )
 
-    def has_view_permission(self, request, obj=None):
-        return request.user.has_perm('auth.view_group')
-
-    def has_add_permission(self, request, obj=None):
-        return request.user.has_perm('auth.add_group')
-
-    def has_change_permission(self, request, obj=None):
-        return request.user.has_perm('auth.change_group')
-
-    def has_delete_permission(self, request, obj=None):
-        return request.user.has_perm('auth.delete_group')
-
-    def has_module_permission(self, request):
-        return self.has_view_permission(request) or self.has_change_permission(request)
-
 
 if _get_setting('PERMISSIONS_AUDITOR_ADMIN'):
     admin.site.register(View, ViewsIndexAdmin)
-    admin.site.register(Group, AuditorGroupAdmin)
+
+    if _get_setting('PERMISSIONS_AUDITOR_ADMIN_OVERRIDE_GROUPS'):
+        admin.site.unregister(Group)
+        admin.site.register(Group, AuditorGroupAdmin)

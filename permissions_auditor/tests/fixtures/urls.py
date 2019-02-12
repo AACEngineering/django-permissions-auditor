@@ -19,6 +19,7 @@ old_style_urls = ([
 
 urlpatterns = [
     path('', views.BaseView.as_view()),
+    path('multi_perm_view/', views.PermissionRequiredMultiView.as_view()),
 
     path('new_style/', include(new_style_urls)),
     path('admin/', include(admin_namespace)),
