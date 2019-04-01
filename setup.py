@@ -33,6 +33,7 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Framework :: Django',
         'Framework :: Django :: 2.1',
+        'Framework :: Django :: 2.2',
         'Topic :: Internet :: WWW/HTTP :: Site Management',
         'Topic :: Internet :: WWW/HTTP :: Site Management :: Link Checking',
     ],
