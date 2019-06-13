@@ -11,7 +11,6 @@ cbv_namespace = ([
 
 func_namespaces = ([
     path('users/', function_based.user_index, name='user_index'),
-    path('users/', cbv_based.UserIndex.as_view(), name='user_index'),
     path('super_users/', function_based.superuser_index, name='superuser_index'),
     path('permissions/', function_based.permissions_index, name='permissions_index'),
     path('invalid/', function_based.invalid_permission_view, name='invalid_permission_view'),

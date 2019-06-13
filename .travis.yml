@@ -16,9 +16,11 @@ matrix:
 
       - { python: "3.7", env: DJANGO=2.1 }
       - { python: "3.7", env: DJANGO=2.2 }
-      - { python: "3.7", env: DJANGO=master }
 
       - { python: "3.7", env: TOXENV=lint }
+
+      - { python: "3.7", env: DJANGO=master }
+      - { python: "3.8-dev", env: Django=master }
 
     allow_failures:
       - env: DJANGO=master
