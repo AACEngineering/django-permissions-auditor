@@ -1,6 +1,12 @@
 Changelog
 =========
 
+v0.5.1 (Release TBD)
+------------------
+
+- Handle cases where multiple permissions are found for a single permission string in the django admin.
+
+
 v0.5.0 (Released 2/12/2019)
 ------------------
 

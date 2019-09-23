@@ -1,10 +1,11 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.contrib.admin import helpers
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import GroupAdmin
 from django.contrib.auth.models import Group, Permission
 from django.db import models
 from django.db.models import Prefetch
+from django.http import HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.urls import path, reverse
 from django.utils.html import mark_safe
@@ -71,7 +72,11 @@ class ViewsIndexAdmin(admin.ModelAdmin):
         return TemplateResponse(request, "permissions_auditor/admin/views_index.html", context)
 
     def permission_detail(self, request, permission, obj=None):
-        obj = self.get_object(request, permission)
+        try:
+            obj = self.get_object(request, permission)
+        except Permission.MultipleObjectsReturned:
+            return self._get_obj_multiple_exist_redirect(request, permission)
+
         if obj is None:
             return self._get_obj_does_not_exist_redirect(request, self.model._meta, permission)
 
@@ -135,6 +140,19 @@ class ViewsIndexAdmin(admin.ModelAdmin):
 
     def has_auditor_change_permission(self, request):
         return request.user.has_perms(['auth.change_user', 'auth.change_group'])
+
+    def _get_obj_multiple_exist_redirect(self, request, permission):
+        """
+        Create a message informing the user that multiple permissions were found
+        for the specified permission string, and return to the admin index page.
+        """
+        msg = _('Found multiple permissions when looking up “%(permission)s”. '
+                'Please ensure only a single permission exists with this name.') % {
+            'permission': permission
+        }
+        self.message_user(request, msg, messages.WARNING)
+        url = reverse('admin:index', current_app=self.admin_site.name)
+        return HttpResponseRedirect(url)
 
 
 class AuditorGroupAdmin(GroupAdmin):
