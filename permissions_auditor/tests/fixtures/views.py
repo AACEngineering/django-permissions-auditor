@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import (
 from django.contrib.auth.mixins import (
     LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
 )
+from django.utils.decorators import method_decorator
 from django.views.generic import View
 
 
@@ -18,6 +19,12 @@ class BaseView(View):
 
 class LoginRequiredView(LoginRequiredMixin, View):
     pass
+
+
+class LoginRequiredMethodDecoratorView(View):
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
 
 
 class PermissionRequiredView(PermissionRequiredMixin, View):
@@ -48,6 +55,18 @@ class PermissionRequiredViewNoDocstring(PermissionRequiredMixin, View):
 
     def has_permission(self):
         return super().has_permission()
+
+
+class PermissionRequiredMethodDecoratorView(View):
+    @method_decorator(permission_required('tests.test_perm'))
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+
+class StaffMemberRequiredMethodDecoratorView(View):
+    @method_decorator(staff_member_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
 
 
 class UserPassesTestView(UserPassesTestMixin, View):
@@ -119,4 +138,10 @@ def superuser_required_view(request):
 
 @user_passes_test(lambda u: u.email is not None)
 def user_passes_test_view(request):
+    pass
+
+
+@user_passes_test(lambda u: u.email is not None)
+@login_required
+def nested_decorator_view(request):
     pass

@@ -16,6 +16,8 @@ Other useful base classes:
 
 .. autoclass:: permissions_auditor.processors.base.BaseCBVProcessor
 
+.. autoclass:: permissions_auditor.processors.base.BaseDecoratorProcessor
+
 .. autoclass:: permissions_auditor.processors.base.BaseFileredMixinProcessor
     :members: class_filter, get_class_filter
 
