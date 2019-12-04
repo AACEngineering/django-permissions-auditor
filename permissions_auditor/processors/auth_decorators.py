@@ -2,43 +2,62 @@
 
 import inspect
 
-from .base import BaseFuncViewProcessor
+from .base import BaseDecoratorProcessor
 
 
-class PermissionRequiredDecoratorProcessor(BaseFuncViewProcessor):
+class PermissionRequiredDecoratorProcessor(BaseDecoratorProcessor):
     """
-    Process ``@permission_required()`` decorator on function based views.
+    Process ``@permission_required()`` decorator.
     """
 
     def can_process(self, view):
-        if not super().can_process(view):
-            return False
+        if inspect.isclass(view):
+            for func in self._get_method_decorators(view.dispatch):
+                if 'user_passes_test' not in (func.__name__, func.__qualname__.split('.')[0]):
+                    continue
 
-        # Unwrap the function and look for the has_perms() function.
-        closures = inspect.getclosurevars(view).nonlocals
-        if 'test_func' in closures:
-            test_closures = inspect.getclosurevars(closures['test_func']).unbound
-            if 'has_perms' in test_closures:
-                return True
+                test_func = inspect.getclosurevars(func).nonlocals['test_func']
+                if test_func.__name__ == 'check_perms':
+                    return True
+
+        elif inspect.isfunction(view):
+            # Unwrap the function and look for the has_perms property.
+            return self._has_func_decorator(view, 'has_perms')
 
         return False
 
     def get_permission_required(self, view):
         permissions = []
 
-        # Unwrap the function and search for the permission passed through
-        # the @permission_required() decorator.
-        closures = inspect.getclosurevars(view).nonlocals['test_func']
-        test_func_closures = inspect.getclosurevars(closures).nonlocals
-        if 'perm' in test_func_closures:
-            perm = test_func_closures['perm']
+        if inspect.isclass(view):
+            for func in self._get_method_decorators(view.dispatch):
+                if 'user_passes_test' not in (func.__name__, func.__qualname__.split('.')[0]):
+                    continue
 
-            # Ensure perm is not a function
-            if not inspect.isfunction(perm):
-                if isinstance(perm, str):
-                    permissions.append(perm)
-                else:
-                    permissions.extend(perm)
+                test_func = inspect.getclosurevars(func).nonlocals['test_func']
+                if test_func.__name__ == 'check_perms':
+                    closures = inspect.getclosurevars(test_func).nonlocals
+                    if 'perm' in closures:
+                        perm = closures['perm']
+
+                        # Ensure perm is not a function
+                        if not inspect.isfunction(perm):
+                            if isinstance(perm, str):
+                                permissions.append(perm)
+                            else:
+                                permissions.extend(perm)
+
+        elif inspect.isfunction(view) and self._has_test_func(view):
+            for closure in self._get_test_func_closures(view):
+                if 'perm' in closure.nonlocals:
+                    perm = closure.nonlocals['perm']
+
+                    # Ensure perm is not a function
+                    if not inspect.isfunction(perm):
+                        if isinstance(perm, str):
+                            permissions.append(perm)
+                        else:
+                            permissions.extend(perm)
 
         return permissions
 
@@ -46,21 +65,18 @@ class PermissionRequiredDecoratorProcessor(BaseFuncViewProcessor):
         return True
 
 
-class LoginRequiredDecoratorProcessor(BaseFuncViewProcessor):
+class LoginRequiredDecoratorProcessor(BaseDecoratorProcessor):
     """
-    Process ``@login_required`` decorator on function based views.
+    Process ``@login_required`` decorator.
     """
 
     def can_process(self, view):
-        if not super().can_process(view):
-            return False
+        if inspect.isclass(view):
+            return self._has_method_decorator(view.dispatch, 'login_required')
 
-        # Unwrap the function and look for the is_authenticated property.
-        closures = inspect.getclosurevars(view).nonlocals
-        if 'test_func' in closures:
-            test_closures = inspect.getclosurevars(closures['test_func']).unbound
-            if 'is_authenticated' in test_closures:
-                return True
+        elif inspect.isfunction(view):
+            # Unwrap the function and look for the is_authenticated property.
+            return self._has_func_decorator(view, 'is_authenticated')
 
         return False
 
@@ -68,21 +84,18 @@ class LoginRequiredDecoratorProcessor(BaseFuncViewProcessor):
         return True
 
 
-class StaffMemberRequiredDecoratorProcessor(BaseFuncViewProcessor):
+class StaffMemberRequiredDecoratorProcessor(BaseDecoratorProcessor):
     """
-    Process Django admin's ``@staff_member_required`` decorator on function based views.
+    Process Django admin's ``@staff_member_required`` decorator.
     """
 
     def can_process(self, view):
-        if not super().can_process(view):
-            return False
+        if inspect.isclass(view):
+            return self._has_method_decorator(view.dispatch, 'staff_member_required')
 
-        # Unwrap the function and look for the is_staff property.
-        closures = inspect.getclosurevars(view).nonlocals
-        if 'test_func' in closures:
-            test_closures = inspect.getclosurevars(closures['test_func']).unbound
-            if 'is_staff' in test_closures:
-                return True
+        elif inspect.isfunction(view):
+            # Unwrap the function and look for the is_staff property.
+            return self._has_func_decorator(view, 'is_staff')
 
         return False
 
@@ -93,21 +106,18 @@ class StaffMemberRequiredDecoratorProcessor(BaseFuncViewProcessor):
         return 'Staff member required'
 
 
-class ActiveUserRequiredDecoratorProcessor(BaseFuncViewProcessor):
+class ActiveUserRequiredDecoratorProcessor(BaseDecoratorProcessor):
     """
-    Process ``@user_passes_test(lambda u: u.is_active)`` decorator on function based views.
+    Process ``@user_passes_test(lambda u: u.is_active)`` decorator.
     """
 
     def can_process(self, view):
-        if not super().can_process(view):
-            return False
+        if inspect.isclass(view) and self._has_method_decorator(view.dispatch, 'user_passes_test'):
+            return self._has_test_func_lambda(view.dispatch, 'is_active')
 
-        # Unwrap the function and look for the is_active property.
-        closures = inspect.getclosurevars(view).nonlocals
-        if 'test_func' in closures:
-            test_closures = inspect.getclosurevars(closures['test_func']).unbound
-            if 'is_active' in test_closures:
-                return True
+        elif inspect.isfunction(view):
+            # Unwrap the function and look for the is_active property.
+            return self._has_func_decorator(view, 'is_active')
 
         return False
 
@@ -118,21 +128,18 @@ class ActiveUserRequiredDecoratorProcessor(BaseFuncViewProcessor):
         return 'Active user required'
 
 
-class AnonymousUserRequiredDecoratorProcessor(BaseFuncViewProcessor):
+class AnonymousUserRequiredDecoratorProcessor(BaseDecoratorProcessor):
     """
-    Process ``@user_passes_test(lambda u: u.is_anonymous)`` decorator on function based views.
+    Process ``@user_passes_test(lambda u: u.is_anonymous)`` decorator.
     """
 
     def can_process(self, view):
-        if not super().can_process(view):
-            return False
+        if inspect.isclass(view) and self._has_method_decorator(view.dispatch, 'user_passes_test'):
+            return self._has_test_func_lambda(view.dispatch, 'is_anonymous')
 
-        # Unwrap the function and look for the is_anonymous property.
-        closures = inspect.getclosurevars(view).nonlocals
-        if 'test_func' in closures:
-            test_closures = inspect.getclosurevars(closures['test_func']).unbound
-            if 'is_anonymous' in test_closures:
-                return True
+        elif inspect.isfunction(view):
+            # Unwrap the function and look for the is_anonymous property.
+            return self._has_func_decorator(view, 'is_anonymous')
 
         return False
 
@@ -140,21 +147,18 @@ class AnonymousUserRequiredDecoratorProcessor(BaseFuncViewProcessor):
         return 'Anonymous user required'
 
 
-class SuperUserRequiredDecoratorProcessor(BaseFuncViewProcessor):
+class SuperUserRequiredDecoratorProcessor(BaseDecoratorProcessor):
     """
-    Process ``@user_passes_test(lambda u: u.is_superuser)`` decorator on function based views.
+    Process ``@user_passes_test(lambda u: u.is_superuser)`` decorator.
     """
 
     def can_process(self, view):
-        if not super().can_process(view):
-            return False
+        if inspect.isclass(view) and self._has_method_decorator(view.dispatch, 'user_passes_test'):
+            return self._has_test_func_lambda(view.dispatch, 'is_superuser')
 
-        # Unwrap the function and look for the is_superuser property.
-        closures = inspect.getclosurevars(view).nonlocals
-        if 'test_func' in closures:
-            test_closures = inspect.getclosurevars(closures['test_func']).unbound
-            if 'is_superuser' in test_closures:
-                return True
+        elif inspect.isfunction(view):
+            # Unwrap the function and look for the is_superuser property.
+            return self._has_func_decorator(view, 'is_superuser')
 
         return False
 
@@ -165,9 +169,9 @@ class SuperUserRequiredDecoratorProcessor(BaseFuncViewProcessor):
         return 'Superuser required'
 
 
-class UserPassesTestDecoratorProcessor(BaseFuncViewProcessor):
+class UserPassesTestDecoratorProcessor(BaseDecoratorProcessor):
     """
-    Process ``@user_passes_test()`` decorator on function based views.
+    Process ``@user_passes_test()`` decorator.
 
     .. note::
         the ``@user_passes_test`` decorator does not automatically check
@@ -177,21 +181,25 @@ class UserPassesTestDecoratorProcessor(BaseFuncViewProcessor):
     """
 
     def can_process(self, view):
-        if not super().can_process(view):
-            return False
-
-        # The other decorators build from the user_passes_test decorator,
-        # so we need to blacklist their functions so we don't override their results.
+        # Some decorators use user_passes_test() internally, so we need to filter
+        # them out since they are processed elsewhere.
         blacklist = (
             'is_authenticated', 'has_perms', 'is_staff', 'is_active', 'is_anonymous',
             'is_superuser',
         )
 
-        # Unwrap the function and look for any test functions inside the decorator.
-        closures = inspect.getclosurevars(view).nonlocals
-        if 'test_func' in closures:
-            test_closures = inspect.getclosurevars(closures['test_func']).unbound
-            return any([closure not in blacklist for closure in test_closures])
+        if inspect.isclass(view):
+            for func in self._get_method_decorators(view.dispatch):
+                if 'user_passes_test' not in (func.__name__, func.__qualname__.split('.')[0]):
+                    continue
+
+                if not any([self._has_test_func_lambda(func, tag) for tag in blacklist]):
+                    return True
+
+        if inspect.isfunction(view) and self._has_test_func(view):
+            for closure in self._get_test_func_closures(view):
+                if not any([tag in closure.unbound for tag in blacklist]):
+                    return True
 
         return False
 

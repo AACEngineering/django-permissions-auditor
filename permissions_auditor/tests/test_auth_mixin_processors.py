@@ -6,53 +6,35 @@ from permissions_auditor.tests.fixtures import views
 class MixinProcessorTestCaseMixin:
     """Mixins should never be able to process function based views."""
 
-    def test_base_view(self):
-        self.assertProcessorResults(views.base_view, can_process=False)
-
-    def test_login_required_view(self):
-        self.assertProcessorResults(views.login_required_view, can_process=False)
-
-    def test_permission_required_view(self):
-        self.assertProcessorResults(views.permission_required_view, can_process=False)
-
-    def test_staff_member_required_view(self):
-        self.assertProcessorResults(views.staff_member_required_view, can_process=False)
-
-    def test_active_user_required_view(self):
-        self.assertProcessorResults(views.active_user_required_view, can_process=False)
-
-    def test_anonymous_user_required_view(self):
-        self.assertProcessorResults(views.anonymous_user_required_view, can_process=False)
-
-    def test_superuser_required_view(self):
-        self.assertProcessorResults(views.superuser_required_view, can_process=False)
-
-    def test_user_passes_test_view(self):
-        self.assertProcessorResults(views.user_passes_test_view, can_process=False)
+    def assert_cannot_process_non_cbvs(self):
+        self.assertCannotProcess([
+            views.base_view, views.BaseView,
+            views.login_required_view,
+            views.staff_member_required_view,
+            views.active_user_required_view,
+            views.anonymous_user_required_view,
+            views.superuser_required_view,
+            views.user_passes_test_view
+        ])
 
 
 class TestLoginRequiredMixinProcessor(MixinProcessorTestCaseMixin, ProcessorTestCase):
 
     def setUp(self):
         self.processor = auth_mixins.LoginRequiredMixinProcessor()
+        self.expected_results = {'permissions': [], 'login_required': True, 'docstring': None}
 
-    def test_cb_baseview(self):
-        self.assertProcessorResults(views.BaseView, can_process=False)
+    def test_cannot_process(self):
+        self.assertCannotProcess([
+            views.PermissionRequiredView, views.PermissionRequiredMultiView,
+            views.PermissionRequiredViewNoPerm,
+            views.PermissionRequiredViewDocstring, views.PermissionRequiredViewNoDocstring,
+            views.UserPassesTestView, views.UserPassesTestViewCustomFunc,
+            views.UserPassesTestViewDocstring, views.UserPassesTestViewNoDocstring
+        ])
 
     def test_cb_loginrequiredview(self):
-        self.assertProcessorResults(
-            views.LoginRequiredView,
-            can_process=True,
-            permissions=[],
-            login_required=True,
-            docstring=None
-        )
-
-    def test_cb_permissionsrequiredview(self):
-        self.assertProcessorResults(views.PermissionRequiredView, can_process=False)
-
-    def test_cb_userpassestestview(self):
-        self.assertProcessorResults(views.UserPassesTestView, can_process=False)
+        self.assertCanProcessView(views.LoginRequiredView, **self.expected_results)
 
 
 class TestPermissionRequiredMixinProcessor(MixinProcessorTestCaseMixin, ProcessorTestCase):
@@ -60,40 +42,33 @@ class TestPermissionRequiredMixinProcessor(MixinProcessorTestCaseMixin, Processo
     def setUp(self):
         self.processor = auth_mixins.PermissionRequiredMixinProcessor()
 
-    def test_cb_baseview(self):
-        self.assertProcessorResults(views.BaseView, can_process=False)
-
-    def test_cb_loginrequiredview(self):
-        self.assertProcessorResults(views.LoginRequiredView, can_process=False)
+    def test_cannot_process(self):
+        self.assertCannotProcess([
+            views.LoginRequiredView,
+            views.UserPassesTestView, views.UserPassesTestViewCustomFunc,
+            views.UserPassesTestViewDocstring, views.UserPassesTestViewNoDocstring
+        ])
 
     def test_cb_permissionsrequiredview(self):
-        self.assertProcessorResults(
+        self.assertCanProcessView(
             views.PermissionRequiredView,
-            can_process=True,
-            permissions=['tests.test_perm'],
-            login_required=True,
-            docstring=None
+            permissions=['tests.test_perm'], login_required=True, docstring=None
         )
 
     def test_cb_permissionsrequiredview_no_perm(self):
         """
         Views that override has_permission() and do not set permission_required should be processed.
         """
-        self.assertProcessorResults(
+        self.assertCanProcessView(
             views.PermissionRequiredViewNoPerm,
-            can_process=True,
-            permissions=[],
-            login_required=True,
-            docstring='The user\'s first name must be Bob'
+            permissions=[], login_required=True, docstring='The user\'s first name must be Bob'
         )
 
     def test_cb_permissionsrequiredview_docstring(self):
         """Views that implement has_permission() and have a docstring should be retrieved."""
-        self.assertProcessorResults(
+        self.assertCanProcessView(
             views.PermissionRequiredViewDocstring,
-            can_process=True,
-            permissions=['tests.test_perm'],
-            login_required=True,
+            permissions=['tests.test_perm'], login_required=True,
             docstring='Custom docstrings should be detected.'
         )
 
@@ -102,11 +77,9 @@ class TestPermissionRequiredMixinProcessor(MixinProcessorTestCaseMixin, Processo
         Views that implement has_permission() and do not have a docstring
         should return a default messsage.
         """
-        self.assertProcessorResults(
+        self.assertCanProcessView(
             views.PermissionRequiredViewNoDocstring,
-            can_process=True,
-            permissions=['tests.test_perm'],
-            login_required=True,
+            permissions=['tests.test_perm'], login_required=True,
             docstring='Custom (no docstring found)'
         )
 
@@ -114,16 +87,10 @@ class TestPermissionRequiredMixinProcessor(MixinProcessorTestCaseMixin, Processo
         """
         Views with multiple permissions should return all permissions.
         """
-        self.assertProcessorResults(
+        self.assertCanProcessView(
             views.PermissionRequiredMultiView,
-            can_process=True,
-            permissions=['tests.test_perm', 'tests.test_perm2'],
-            login_required=True,
-            docstring=None
+            permissions=['tests.test_perm', 'tests.test_perm2'], login_required=True, docstring=None
         )
-
-    def test_cb_userpassestestview(self):
-        self.assertProcessorResults(views.UserPassesTestView, can_process=False)
 
 
 class TestUserPassesTestMixinProcessor(MixinProcessorTestCaseMixin, ProcessorTestCase):
@@ -131,32 +98,25 @@ class TestUserPassesTestMixinProcessor(MixinProcessorTestCaseMixin, ProcessorTes
     def setUp(self):
         self.processor = auth_mixins.UserPassesTestMixinProcessor()
 
-    def test_cb_baseview(self):
-        self.assertProcessorResults(views.BaseView, can_process=False)
-
-    def test_cb_loginrequiredview(self):
-        self.assertProcessorResults(views.LoginRequiredView, can_process=False)
+    def test_cannot_process(self):
+        self.assertCannotProcess([
+            views.LoginRequiredView,
+            views.PermissionRequiredView, views.PermissionRequiredMultiView,
+            views.PermissionRequiredViewNoPerm,
+            views.PermissionRequiredViewDocstring, views.PermissionRequiredViewNoDocstring
+        ])
 
     def test_cb_userpassestestview(self):
-        self.assertProcessorResults(
+        self.assertCanProcessView(
             views.UserPassesTestView,
-            can_process=True,
-            permissions=[],
-            login_required=None,
-            docstring='Custom (no docstring found)'
+            permissions=[], login_required=None, docstring='Custom (no docstring found)'
         )
-
-    def test_cb_permissionsrequiredview(self):
-        self.assertProcessorResults(views.PermissionRequiredView, can_process=False)
 
     def test_cb_userpassestestview_docstring(self):
         """Views that implement test_func() and have a docstring should be retrieved."""
-        self.assertProcessorResults(
+        self.assertCanProcessView(
             views.UserPassesTestViewDocstring,
-            can_process=True,
-            permissions=[],
-            login_required=None,
-            docstring='Custom docstrings should be detected.'
+            permissions=[], login_required=None, docstring='Custom docstrings should be detected.'
         )
 
     def test_cb_userpassestestview_no_docstring(self):
@@ -164,12 +124,9 @@ class TestUserPassesTestMixinProcessor(MixinProcessorTestCaseMixin, ProcessorTes
         Views that implement test_func() and do not have a docstring
         should return a default messsage.
         """
-        self.assertProcessorResults(
+        self.assertCanProcessView(
             views.UserPassesTestViewNoDocstring,
-            can_process=True,
-            permissions=[],
-            login_required=None,
-            docstring='Custom (no docstring found)'
+            permissions=[], login_required=None, docstring='Custom (no docstring found)'
         )
 
     def test_cb_userpassestestview_custom_func(self):
@@ -177,10 +134,7 @@ class TestUserPassesTestMixinProcessor(MixinProcessorTestCaseMixin, ProcessorTes
         Views that override get_test_func() should check the new function returned
         instead of the default test_func() function.
         """
-        self.assertProcessorResults(
+        self.assertCanProcessView(
             views.UserPassesTestViewCustomFunc,
-            can_process=True,
-            permissions=[],
-            login_required=None,
-            docstring='Custom docstrings should be detected.'
+            permissions=[], login_required=None, docstring='Custom docstrings should be detected.'
         )

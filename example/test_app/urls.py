@@ -1,3 +1,4 @@
+from django.contrib.auth.views import PasswordChangeView
 from django.urls import path, include
 
 from test_app import views
@@ -21,6 +22,7 @@ urlpatterns = [
 
     path('accounts/login/', views.LoginPage.as_view(), name='login'),
     path('accounts/logout/', views.LogoutPage.as_view(), name='logout'),
+    path('accounts/password/change/', PasswordChangeView.as_view(), name='change_password'),
 
     path('cbv/', include(cbv_namespace)),
     path('func/', include(func_namespaces)),

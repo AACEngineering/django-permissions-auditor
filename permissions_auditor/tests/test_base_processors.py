@@ -12,7 +12,7 @@ class BaseProcessorTest(ProcessorTestCase):
         self.processor = base.BaseProcessor()
 
     def test_process(self):
-        self.assertProcessorResults(views.BaseView)
+        self.assertCanProcessView(views.BaseView)
 
 
 class BaseFuncViewProcessorTest(ProcessorTestCase):
@@ -20,10 +20,10 @@ class BaseFuncViewProcessorTest(ProcessorTestCase):
         self.processor = base.BaseFuncViewProcessor()
 
     def test_can_process_class(self):
-        self.assertProcessorResults(views.BaseView, can_process=False)
+        self.assertCannotProcess([views.BaseView])
 
     def test_can_process_function(self):
-        self.assertProcessorResults(views.base_view, can_process=True)
+        self.assertCanProcessView(views.base_view)
 
 
 class BaseCBVProcessorTest(ProcessorTestCase):
@@ -31,10 +31,10 @@ class BaseCBVProcessorTest(ProcessorTestCase):
         self.processor = base.BaseCBVProcessor()
 
     def test_can_process_class(self):
-        self.assertProcessorResults(views.BaseView, can_process=True)
+        self.assertCanProcessView(views.BaseView)
 
     def test_can_process_function(self):
-        self.assertProcessorResults(views.base_view, can_process=False)
+        self.assertCannotProcess([views.base_view])
 
 
 class BaseFilteredMixinProcessorTest(ProcessorTestCase):
@@ -43,20 +43,20 @@ class BaseFilteredMixinProcessorTest(ProcessorTestCase):
 
     def test_no_class_filter_raises_exception(self):
         with self.assertRaises(ImproperlyConfigured):
-            self.assertProcessorResults(views.PermissionRequiredView)
+            self.assertCannotProcess([views.PermissionRequiredView])
 
     def test_can_process_filtered_class(self):
         self.processor.class_filter = 'django.contrib.auth.mixins.PermissionRequiredMixin'
-        self.assertProcessorResults(views.PermissionRequiredView, can_process=True)
-        self.assertProcessorResults(views.LoginRequiredView, can_process=False)
+        self.assertCanProcessView(views.PermissionRequiredView)
+        self.assertCannotProcess([views.LoginRequiredView])
 
     def test_can_process_multiple_filtered_classses(self):
         self.processor.class_filter = (
             'django.contrib.auth.mixins.PermissionRequiredMixin',
             'django.contrib.auth.mixins.LoginRequiredMixin',
         )
-        self.assertProcessorResults(views.PermissionRequiredView, can_process=True)
-        self.assertProcessorResults(views.LoginRequiredView, can_process=True)
+        self.assertCanProcessView(views.PermissionRequiredView)
+        self.assertCanProcessView(views.LoginRequiredView)
 
     def test_can_process_overriden_filtered_class(self):
         """
@@ -68,5 +68,5 @@ class BaseFilteredMixinProcessorTest(ProcessorTestCase):
             return ('django.contrib.auth.mixins.LoginRequiredMixin',)
 
         with patch.object(self.processor, 'get_class_filter', filter_func):
-            self.assertProcessorResults(views.PermissionRequiredView, can_process=False)
-            self.assertProcessorResults(views.LoginRequiredView, can_process=True)
+            self.assertCannotProcess([views.PermissionRequiredView])
+            self.assertCanProcessView(views.LoginRequiredView)
