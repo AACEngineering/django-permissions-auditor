@@ -1,10 +1,10 @@
 Changelog
 =========
 
-v0.6.0 (Release TBD)
+v1.0.0 (Release 12/4/2019)
 --------------------
 
-- Refactored decorator processors.
+- Decorator processors improvements.
 
     Added support for nested decorators:
 
@@ -24,6 +24,8 @@ v0.6.0 (Release TBD)
             @method_decorator(permission_required('auth.view_user'))
             def dispatch(self, request, *args, **kwargs):
                 ...
+
+- Refactored test suite to be much cleaner.
 
 
 v0.5.1 (Released 9/23/2019)

@@ -1,3 +1,5 @@
+from django.contrib.auth.views import PasswordChangeView
+
 from permissions_auditor.processors import auth_decorators
 from permissions_auditor.tests.base import ProcessorTestCase
 from permissions_auditor.tests.fixtures import (
@@ -11,436 +13,223 @@ class DecoratorProcessorTestCaseMixin:
     that do not use ``@method_decorator``.
     """
 
-    def test_cb_baseview(self):
-        self.assertProcessorResults(base_views.BaseView, can_process=False)
-
-    def test_base_view(self):
-        self.assertProcessorResults(base_views.base_view, can_process=False)
-
-    def test_cb_loginrequiredview(self):
-        self.assertProcessorResults(mixin_views.LoginRequiredView, can_process=False)
-
-    def test_cb_permissionsrequiredview(self):
-        self.assertProcessorResults(mixin_views.PermissionRequiredView, can_process=False)
-
-    def test_cb_userpassestestview(self):
-        self.assertProcessorResults(mixin_views.UserPassesTestView, can_process=False)
+    def test_cannot_process_non_method_decorator_cbvs(self):
+        self.assertCannotProcess([
+            base_views.BaseView, base_views.base_view,
+            mixin_views.LoginRequiredView,
+            mixin_views.PermissionRequiredView,
+            mixin_views.UserPassesTestView
+        ])
 
 
 class TestLoginRequiredDecoratorProcessor(DecoratorProcessorTestCaseMixin, ProcessorTestCase):
 
     def setUp(self):
         self.processor = auth_decorators.LoginRequiredDecoratorProcessor()
+        self.expected_results = {'login_required': True}
+
+    def test_cannot_process(self):
+        self.assertCannotProcess([
+            views.permission_required_view, views.PermissionRequiredMethodDecoratorView,
+            views.staff_member_required_view, views.StaffMemberRequiredMethodDecoratorView,
+            views.active_user_required_view, views.ActiveUserRequiredMethodDecoratorView,
+            views.anonymous_user_required_view, views.AnonymousUserRequiredMethodDecoratorView,
+            views.superuser_required_view, views.SuperUserRequiredMethodDecoratorView,
+            views.user_passes_test_view, views.UserPassesTestMethodDecoratorView
+        ])
+
+    def test_django_password_change_view(self):
+        self.assertCanProcessView(PasswordChangeView, **self.expected_results)
 
     def test_login_required_view(self):
-        self.assertProcessorResults(
-            views.login_required_view, can_process=True, login_required=True
-        )
+        self.assertCanProcessView(views.login_required_view, **self.expected_results)
 
     def test_cb_loginrequired_decorator_view(self):
-        self.assertProcessorResults(
-            views.LoginRequiredMethodDecoratorView, can_process=True, login_required=True
-        )
-
-    def test_permission_required_view(self):
-        self.assertProcessorResults(views.permission_required_view, can_process=False)
-
-    def test_staff_member_required_view(self):
-        self.assertProcessorResults(views.staff_member_required_view, can_process=False)
-
-    def test_staff_member_required_cb_view(self):
-        self.assertProcessorResults(views.StaffMemberRequiredMethodDecoratorView, can_process=False)
-
-    def test_active_user_required_view(self):
-        self.assertProcessorResults(views.active_user_required_view, can_process=False)
-
-    def test_active_user_required_cb_view(self):
-        self.assertProcessorResults(
-            views.ActiveUserRequiredMethodDecoratorView, can_process=False)
-
-    def test_anonymous_user_required_view(self):
-        self.assertProcessorResults(views.anonymous_user_required_view, can_process=False)
-
-    def test_anonymous_user_required_cb_view(self):
-        self.assertProcessorResults(
-            views.AnonymousUserRequiredMethodDecoratorView, can_process=False)
-
-    def test_superuser_required_view(self):
-        self.assertProcessorResults(views.superuser_required_view, can_process=False)
-
-    def test_superuser_required_cb_view(self):
-        self.assertProcessorResults(views.SuperUserRequiredMethodDecoratorView, can_process=False)
-
-    def test_user_passes_test_view(self):
-        self.assertProcessorResults(views.user_passes_test_view, can_process=False)
+        self.assertCanProcessView(views.LoginRequiredMethodDecoratorView, **self.expected_results)
 
     def test_nested_decorator_view(self):
-        self.assertProcessorResults(
-            views.nested_decorator_view, can_process=True, login_required=True
-        )
+        self.assertCanProcessView(views.nested_decorator_view, **self.expected_results)
 
-    def test_nested_decorator_cb_view(self):
-        self.assertProcessorResults(
-            views.NestedMethodDecoratorView, can_process=True, login_required=True
-        )
+    def test_nested_decorator_cbv(self):
+        self.assertCanProcessView(views.NestedMethodDecoratorView, **self.expected_results)
 
 
 class TestPermissionRequiredDecoratorProcessor(DecoratorProcessorTestCaseMixin, ProcessorTestCase):
 
     def setUp(self):
         self.processor = auth_decorators.PermissionRequiredDecoratorProcessor()
+        self.expected_results = {'permissions': ['tests.test_perm'], 'login_required': True}
 
-    def test_login_required_view(self):
-        self.assertProcessorResults(views.login_required_view, can_process=False)
-
-    def test_cb_loginrequired_decorator_view(self):
-        self.assertProcessorResults(views.LoginRequiredMethodDecoratorView, can_process=False)
+    def test_cannot_process(self):
+        self.assertCannotProcess([
+            views.login_required_view, views.LoginRequiredMethodDecoratorView,
+            views.staff_member_required_view, views.StaffMemberRequiredMethodDecoratorView,
+            views.active_user_required_view, views.ActiveUserRequiredMethodDecoratorView,
+            views.anonymous_user_required_view, views.AnonymousUserRequiredMethodDecoratorView,
+            views.superuser_required_view, views.SuperUserRequiredMethodDecoratorView,
+            views.user_passes_test_view, views.UserPassesTestMethodDecoratorView,
+            views.nested_decorator_view, views.NestedMethodDecoratorView
+        ])
 
     def test_permission_required_view(self):
-        self.assertProcessorResults(
-            views.PermissionRequiredMethodDecoratorView,
-            can_process=True, permissions=['tests.test_perm'], login_required=True
+        self.assertCanProcessView(
+            views.PermissionRequiredMethodDecoratorView, **self.expected_results
         )
 
-    def test_cb_permission_required_view(self):
-        self.assertProcessorResults(
-            views.permission_required_view,
-            can_process=True, permissions=['tests.test_perm'], login_required=True
-        )
+    def test_permission_required_cbv(self):
+        self.assertCanProcessView(views.permission_required_view, **self.expected_results)
 
     def test_permission_required_multi_view(self):
         """Multiple permissions passed to @permission_required should be retrieved."""
-        self.assertProcessorResults(
+        self.assertCanProcessView(
             views.permission_required_multi_view,
-            can_process=True,
             permissions=['tests.test_perm', 'tests.test_perm2'], login_required=True,
         )
-
-    def test_staff_member_required_view(self):
-        self.assertProcessorResults(views.staff_member_required_view, can_process=False)
-
-    def test_staff_member_required_cb_view(self):
-        self.assertProcessorResults(views.StaffMemberRequiredMethodDecoratorView, can_process=False)
-
-    def test_active_user_required_view(self):
-        self.assertProcessorResults(views.active_user_required_view, can_process=False)
-
-    def test_active_user_required_cb_view(self):
-        self.assertProcessorResults(
-            views.ActiveUserRequiredMethodDecoratorView, can_process=False)
-
-    def test_anonymous_user_required_view(self):
-        self.assertProcessorResults(views.anonymous_user_required_view, can_process=False)
-
-    def test_anonymous_user_required_cb_view(self):
-        self.assertProcessorResults(
-            views.AnonymousUserRequiredMethodDecoratorView, can_process=False)
-
-    def test_superuser_required_view(self):
-        self.assertProcessorResults(views.superuser_required_view, can_process=False)
-
-    def test_superuser_required_cb_view(self):
-        self.assertProcessorResults(views.SuperUserRequiredMethodDecoratorView, can_process=False)
-
-    def test_user_passes_test_view(self):
-        self.assertProcessorResults(views.user_passes_test_view, can_process=False)
-
-    def test_nested_decorator_view(self):
-        self.assertProcessorResults(views.nested_decorator_view, can_process=False)
 
 
 class StaffMemberRequiredDecoratorProcessor(DecoratorProcessorTestCaseMixin, ProcessorTestCase):
 
     def setUp(self):
         self.processor = auth_decorators.StaffMemberRequiredDecoratorProcessor()
+        self.expected_results = {'login_required': True, 'docstring': 'Staff member required'}
 
-    def test_login_required_view(self):
-        self.assertProcessorResults(views.login_required_view, can_process=False)
-
-    def test_cb_loginrequired_decorator_view(self):
-        self.assertProcessorResults(views.LoginRequiredMethodDecoratorView, can_process=False)
-
-    def test_permission_required_view(self):
-        self.assertProcessorResults(views.permission_required_view, can_process=False)
+    def test_cannot_process(self):
+        self.assertCannotProcess([
+            views.login_required_view, views.LoginRequiredMethodDecoratorView,
+            views.permission_required_view, views.PermissionRequiredMethodDecoratorView,
+            views.active_user_required_view, views.ActiveUserRequiredMethodDecoratorView,
+            views.anonymous_user_required_view, views.AnonymousUserRequiredMethodDecoratorView,
+            views.superuser_required_view, views.SuperUserRequiredMethodDecoratorView,
+            views.user_passes_test_view, views.UserPassesTestMethodDecoratorView,
+            views.nested_decorator_view, views.NestedMethodDecoratorView
+        ])
 
     def test_staff_member_required_view(self):
-        self.assertProcessorResults(
-            views.staff_member_required_view,
-            can_process=True, login_required=True, docstring='Staff member required'
-        )
+        self.assertCanProcessView(views.staff_member_required_view, **self.expected_results)
 
     def test_staff_member_required_cb_view(self):
-        self.assertProcessorResults(
-            views.StaffMemberRequiredMethodDecoratorView,
-            can_process=True, login_required=True, docstring='Staff member required'
+        self.assertCanProcessView(
+            views.StaffMemberRequiredMethodDecoratorView, **self.expected_results
         )
-
-    def test_active_user_required_view(self):
-        self.assertProcessorResults(views.active_user_required_view, can_process=False)
-
-    def test_active_user_required_cb_view(self):
-        self.assertProcessorResults(
-            views.ActiveUserRequiredMethodDecoratorView, can_process=False)
-
-    def test_anonymous_user_required_view(self):
-        self.assertProcessorResults(views.anonymous_user_required_view, can_process=False)
-
-    def test_anonymous_user_required_cb_view(self):
-        self.assertProcessorResults(
-            views.AnonymousUserRequiredMethodDecoratorView, can_process=False)
-
-    def test_superuser_required_view(self):
-        self.assertProcessorResults(views.superuser_required_view, can_process=False)
-
-    def test_superuser_required_cb_view(self):
-        self.assertProcessorResults(views.SuperUserRequiredMethodDecoratorView, can_process=False)
-
-    def test_user_passes_test_view(self):
-        self.assertProcessorResults(views.user_passes_test_view, can_process=False)
-
-    def test_nested_decorator_view(self):
-        self.assertProcessorResults(views.nested_decorator_view, can_process=False)
 
 
 class ActiveUserRequiredDecoratorProcessor(DecoratorProcessorTestCaseMixin, ProcessorTestCase):
 
     def setUp(self):
         self.processor = auth_decorators.ActiveUserRequiredDecoratorProcessor()
+        self.expected_results = {'login_required': True, 'docstring': 'Active user required'}
 
-    def test_login_required_view(self):
-        self.assertProcessorResults(views.login_required_view, can_process=False)
-
-    def test_cb_loginrequired_decorator_view(self):
-        self.assertProcessorResults(views.LoginRequiredMethodDecoratorView, can_process=False)
-
-    def test_permission_required_view(self):
-        self.assertProcessorResults(
-            views.permission_required_view, can_process=False)
+    def test_cannot_process(self):
+        self.assertCannotProcess([
+            views.login_required_view, views.LoginRequiredMethodDecoratorView,
+            views.permission_required_view, views.PermissionRequiredMethodDecoratorView,
+            views.anonymous_user_required_view, views.AnonymousUserRequiredMethodDecoratorView,
+            views.superuser_required_view, views.SuperUserRequiredMethodDecoratorView,
+            views.user_passes_test_view, views.UserPassesTestMethodDecoratorView
+        ])
 
     def test_staff_member_required_view(self):
         # Internally, ``staff_member_required`` runs this lamda:
         # lambda u: u.is_active and u.is_staff
-        self.assertProcessorResults(
-            views.staff_member_required_view,
-            can_process=True, login_required=True, docstring='Active user required'
-        )
+        self.assertCanProcessView(views.staff_member_required_view, **self.expected_results)
 
-    def test_staff_member_required_cb_view(self):
+    def test_staff_member_required_cbv(self):
         # Quirk: when ``staf_member_required`` is wrapped with ``method_decorator``,
         # the lamda expression can no longer be found in the function closures,
         # so this should return false.
-        self.assertProcessorResults(
-            views.StaffMemberRequiredMethodDecoratorView, can_process=False)
+        self.assertCannotProcess([views.StaffMemberRequiredMethodDecoratorView])
 
     def test_active_user_required_view(self):
-        self.assertProcessorResults(
-            views.active_user_required_view,
-            can_process=True, login_required=True, docstring='Active user required'
+        self.assertCanProcessView(views.active_user_required_view, **self.expected_results)
+
+    def test_active_user_required_cbv(self):
+        self.assertCanProcessView(
+            views.ActiveUserRequiredMethodDecoratorView, **self.expected_results
         )
-
-    def test_active_user_required_cb_view(self):
-        self.assertProcessorResults(
-            views.ActiveUserRequiredMethodDecoratorView,
-            can_process=True, login_required=True, docstring='Active user required'
-        )
-
-    def test_anonymous_user_required_view(self):
-        self.assertProcessorResults(views.anonymous_user_required_view, can_process=False)
-
-    def test_anonymous_user_required_cb_view(self):
-        self.assertProcessorResults(
-            views.AnonymousUserRequiredMethodDecoratorView, can_process=False)
-
-    def test_superuser_required_view(self):
-        self.assertProcessorResults(views.superuser_required_view, can_process=False)
-
-    def test_superuser_required_cb_view(self):
-        self.assertProcessorResults(views.SuperUserRequiredMethodDecoratorView, can_process=False)
-
-    def test_user_passes_test_view(self):
-        self.assertProcessorResults(views.user_passes_test_view, can_process=False)
 
     def test_nested_decorator_view(self):
-        self.assertProcessorResults(
-            views.nested_decorator_view,
-            can_process=True, login_required=True, docstring='Active user required'
-        )
+        self.assertCanProcessView(views.nested_decorator_view, **self.expected_results)
 
-    def test_nested_decorator_cb_view(self):
-        self.assertProcessorResults(
-            views.NestedMethodDecoratorView,
-            can_process=True, login_required=True, docstring='Active user required'
-        )
+    def test_nested_decorator_cbv(self):
+        self.assertCanProcessView(views.NestedMethodDecoratorView, **self.expected_results)
 
 
 class AnonymousUserRequiredDecoratorProcessor(DecoratorProcessorTestCaseMixin, ProcessorTestCase):
 
     def setUp(self):
         self.processor = auth_decorators.AnonymousUserRequiredDecoratorProcessor()
+        self.expected_results = {'login_required': False, 'docstring': 'Anonymous user required'}
 
-    def test_login_required_view(self):
-        self.assertProcessorResults(views.login_required_view, can_process=False)
-
-    def test_cb_loginrequired_decorator_view(self):
-        self.assertProcessorResults(views.LoginRequiredMethodDecoratorView, can_process=False)
-
-    def test_permission_required_view(self):
-        self.assertProcessorResults(
-            views.permission_required_view, can_process=False)
-
-    def test_staff_member_required_view(self):
-        self.assertProcessorResults(views.staff_member_required_view, can_process=False)
-
-    def test_staff_member_required_cb_view(self):
-        self.assertProcessorResults(views.StaffMemberRequiredMethodDecoratorView, can_process=False)
-
-    def test_active_user_required_view(self):
-        self.assertProcessorResults(views.active_user_required_view, can_process=False)
-
-    def test_active_user_required_cb_view(self):
-        self.assertProcessorResults(
-            views.ActiveUserRequiredMethodDecoratorView, can_process=False)
+    def test_cannot_process(self):
+        self.assertCannotProcess([
+            views.login_required_view, views.LoginRequiredMethodDecoratorView,
+            views.permission_required_view, views.PermissionRequiredMethodDecoratorView,
+            views.staff_member_required_view, views.StaffMemberRequiredMethodDecoratorView,
+            views.active_user_required_view, views.ActiveUserRequiredMethodDecoratorView,
+            views.superuser_required_view, views.SuperUserRequiredMethodDecoratorView,
+            views.user_passes_test_view, views.UserPassesTestMethodDecoratorView,
+            views.nested_decorator_view, views.NestedMethodDecoratorView
+        ])
 
     def test_anonymous_user_required_view(self):
-        self.assertProcessorResults(
-            views.anonymous_user_required_view,
-            can_process=True, login_required=False, docstring='Anonymous user required'
+        self.assertCanProcessView(views.anonymous_user_required_view, **self.expected_results)
+
+    def test_anonymous_user_required_cbv(self):
+        self.assertCanProcessView(
+            views.AnonymousUserRequiredMethodDecoratorView, **self.expected_results
         )
-
-    def test_anonymous_user_required_cb_view(self):
-        self.assertProcessorResults(
-            views.AnonymousUserRequiredMethodDecoratorView,
-            can_process=True, login_required=False, docstring='Anonymous user required'
-        )
-
-    def test_superuser_required_view(self):
-        self.assertProcessorResults(views.superuser_required_view, can_process=False)
-
-    def test_superuser_required_cb_view(self):
-        self.assertProcessorResults(views.SuperUserRequiredMethodDecoratorView, can_process=False)
-
-    def test_user_passes_test_view(self):
-        self.assertProcessorResults(views.user_passes_test_view, can_process=False)
-
-    def test_nested_decorator_view(self):
-        self.assertProcessorResults(views.nested_decorator_view, can_process=False)
 
 
 class SuperUserRequiredDecoratorProcessor(DecoratorProcessorTestCaseMixin, ProcessorTestCase):
 
     def setUp(self):
         self.processor = auth_decorators.SuperUserRequiredDecoratorProcessor()
+        self.expected_results = {'login_required': True, 'docstring': 'Superuser required'}
 
-    def test_login_required_view(self):
-        self.assertProcessorResults(views.login_required_view, can_process=False)
-
-    def test_cb_loginrequired_decorator_view(self):
-        self.assertProcessorResults(views.LoginRequiredMethodDecoratorView, can_process=False)
-
-    def test_permission_required_view(self):
-        self.assertProcessorResults(
-            views.permission_required_view, can_process=False)
-
-    def test_staff_member_required_view(self):
-        self.assertProcessorResults(views.staff_member_required_view, can_process=False)
-
-    def test_staff_member_required_cb_view(self):
-        self.assertProcessorResults(views.StaffMemberRequiredMethodDecoratorView, can_process=False)
-
-    def test_active_user_required_view(self):
-        self.assertProcessorResults(views.active_user_required_view, can_process=False)
-
-    def test_active_user_required_cb_view(self):
-        self.assertProcessorResults(views.ActiveUserRequiredMethodDecoratorView, can_process=False)
-
-    def test_anonymous_user_required_view(self):
-        self.assertProcessorResults(views.anonymous_user_required_view, can_process=False)
-
-    def test_anonymous_user_required_cb_view(self):
-        self.assertProcessorResults(
-            views.AnonymousUserRequiredMethodDecoratorView, can_process=False)
+    def test_cannot_process(self):
+        self.assertCannotProcess([
+            views.login_required_view, views.LoginRequiredMethodDecoratorView,
+            views.permission_required_view, views.PermissionRequiredMethodDecoratorView,
+            views.staff_member_required_view, views.StaffMemberRequiredMethodDecoratorView,
+            views.active_user_required_view, views.ActiveUserRequiredMethodDecoratorView,
+            views.anonymous_user_required_view, views.AnonymousUserRequiredMethodDecoratorView,
+            views.user_passes_test_view, views.UserPassesTestMethodDecoratorView,
+            views.nested_decorator_view, views.NestedMethodDecoratorView
+        ])
 
     def test_superuser_required_view(self):
-        self.assertProcessorResults(
-            views.superuser_required_view,
-            can_process=True, login_required=True, docstring='Superuser required'
+        self.assertCanProcessView(views.superuser_required_view, **self.expected_results)
+
+    def test_superuser_required_cbv(self):
+        self.assertCanProcessView(
+            views.SuperUserRequiredMethodDecoratorView, **self.expected_results
         )
-
-    def test_superuser_required_cb_view(self):
-        self.assertProcessorResults(
-            views.SuperUserRequiredMethodDecoratorView,
-            can_process=True, login_required=True, docstring='Superuser required'
-        )
-
-    def test_user_passes_test_view(self):
-        self.assertProcessorResults(views.user_passes_test_view, can_process=False)
-
-    def test_nested_decorator_view(self):
-        self.assertProcessorResults(views.nested_decorator_view, can_process=False)
 
 
 class UserPassesTestDecoratorProcessor(DecoratorProcessorTestCaseMixin, ProcessorTestCase):
 
     def setUp(self):
         self.processor = auth_decorators.UserPassesTestDecoratorProcessor()
+        self.expected_results = {'login_required': None, 'docstring': 'Custom user test'}
 
-    def test_login_required_view(self):
-        self.assertProcessorResults(views.login_required_view, can_process=False)
-
-    def test_cb_loginrequired_decorator_view(self):
-        self.assertProcessorResults(views.LoginRequiredMethodDecoratorView, can_process=False)
-
-    def test_permission_required_view(self):
-        self.assertProcessorResults(
-            views.permission_required_view, can_process=False)
-
-    def test_staff_member_required_view(self):
-        self.assertProcessorResults(views.staff_member_required_view, can_process=False)
-
-    def test_staff_member_required_cb_view(self):
-        self.assertProcessorResults(views.StaffMemberRequiredMethodDecoratorView, can_process=False)
-
-    def test_active_user_required_view(self):
-        self.assertProcessorResults(views.active_user_required_view, can_process=False)
-
-    def test_active_user_required_cb_view(self):
-        self.assertProcessorResults(
-            views.ActiveUserRequiredMethodDecoratorView, can_process=False)
-
-    def test_anonymous_user_required_view(self):
-        self.assertProcessorResults(views.anonymous_user_required_view, can_process=False)
-
-    def test_anonymous_user_required_cb_view(self):
-        self.assertProcessorResults(
-            views.AnonymousUserRequiredMethodDecoratorView, can_process=False)
-
-    def test_superuser_required_view(self):
-        self.assertProcessorResults(
-            views.superuser_required_view, can_process=False)
-
-    def test_superuser_required_cb_view(self):
-        self.assertProcessorResults(views.SuperUserRequiredMethodDecoratorView, can_process=False)
+    def test_cannot_process(self):
+        self.assertCannotProcess([
+            views.login_required_view, views.LoginRequiredMethodDecoratorView,
+            views.permission_required_view, views.PermissionRequiredMethodDecoratorView,
+            views.staff_member_required_view, views.StaffMemberRequiredMethodDecoratorView,
+            views.active_user_required_view, views.ActiveUserRequiredMethodDecoratorView,
+            views.anonymous_user_required_view, views.AnonymousUserRequiredMethodDecoratorView,
+            views.superuser_required_view, views.SuperUserRequiredMethodDecoratorView,
+        ])
 
     def test_user_passes_test_view(self):
-        self.assertProcessorResults(
-            views.user_passes_test_view,
-            can_process=True, login_required=None, docstring='Custom user test'
-        )
+        self.assertCanProcessView(views.user_passes_test_view, **self.expected_results)
 
     def test_user_passes_test_cb_view(self):
-        self.assertProcessorResults(
-            views.UserPassesTestMethodDecoratorView,
-            can_process=True, login_required=None, docstring='Custom user test'
-        )
+        self.assertCanProcessView(views.UserPassesTestMethodDecoratorView, **self.expected_results)
 
     def test_nested_decorator_view(self):
-        self.assertProcessorResults(
-            views.nested_decorator_view,
-            can_process=True, login_required=None, docstring='Custom user test'
-        )
+        self.assertCanProcessView(views.nested_decorator_view, **self.expected_results)
 
-    def test_nested_decorator_cb_view(self):
-        self.assertProcessorResults(
-            views.NestedMethodDecoratorView,
-            can_process=True, login_required=None, docstring='Custom user test'
-        )
+    def test_nested_decorator_cbv(self):
+        self.assertCanProcessView(views.NestedMethodDecoratorView, **self.expected_results)
