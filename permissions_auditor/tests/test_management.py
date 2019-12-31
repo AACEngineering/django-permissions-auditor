@@ -5,7 +5,7 @@ from django.test import TestCase
 
 class CheckViewPermsTest(TestCase):
 
-    def test_command_output(self):
+    def test_missing_perms(self):
         out = StringIO()
         call_command('check_view_permissions', stdout=out)
         self.assertIn('`tests.test_perm`', out.getvalue())

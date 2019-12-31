@@ -1,8 +1,8 @@
 Changelog
 =========
 
-v1.0.0 (Release 12/4/2019)
---------------------
+v1.0.0 (Released 12/4/2019)
+---------------------------
 
 - Decorator processors improvements.
 
