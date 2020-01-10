@@ -3,8 +3,8 @@ Installation
 
 Requirements:
 
-* Django >=2.1
-* Python 3.5, 3.6, 3.7
+* Django 2.1, 2.2, 3.0
+* Python 3.5, 3.6, 3.7, 3.8
 
 
 To install::
