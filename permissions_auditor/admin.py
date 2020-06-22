@@ -49,8 +49,8 @@ class ViewsIndexAdmin(admin.ModelAdmin):
         ]
 
     def get_object(self, request, permission, from_field=None):
-        app_label, codename = permission.split('.')
         try:
+            app_label, codename = permission.split('.')
             return Permission.objects.get(content_type__app_label=app_label, codename=codename)
         except (Permission.DoesNotExist, ValueError):
             return None
