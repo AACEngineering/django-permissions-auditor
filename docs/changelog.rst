@@ -1,10 +1,16 @@
 Changelog
 =========
 
+v1.0.1 (Released 7/1/2020)
+--------------------------
+
+- Fix admin error when looking up malformed permission strings.
+
+
 v1.0.0 (Released 12/4/2019)
 ---------------------------
 
-- Decorator processors improvements.
+- Decorator processor improvements.
 
     Added support for nested decorators:
 

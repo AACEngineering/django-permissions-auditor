@@ -19,7 +19,7 @@ class BaseProcessor:
 
     def get_permission_required(self, view):
         """
-        Returns ermissions required on the provided view.
+        Returns permissions required on the provided view.
         Must return an iterable.
 
         :param view: the view being processed.
