@@ -1,6 +1,9 @@
 Custom Processors
 ===========================
 
+In situations where custom permission schemes are used, and are not detected by permissions auditor out of the box, you may need to write a custom processor.
+
+
 Base Processors
 ---------------
 

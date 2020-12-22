@@ -1,6 +1,14 @@
 Changelog
 =========
 
+v1.0.1 (Release TBD)
+--------------------------
+
+- Changed "No Grouping" filter to order by URL instead of view name.
+- Added `django.views.generic.base.RedirectView` to the default `view_names` blacklist.
+- Prevented duplicate permissions from being returned for a single view.
+
+
 v1.0.1 (Released 7/1/2020)
 --------------------------
 
@@ -50,7 +58,7 @@ v0.5.0 (Released 2/12/2019)
 v0.4.3 (Released 1/28/2019)
 ---------------------------
 
-- Prevented the app from creating migrations
+- Fixed an issue which caused the app to create migrations for models that didn't exist.
 
 
 v0.4.2 (Released 1/23/2019)
@@ -63,21 +71,21 @@ v0.4.2 (Released 1/23/2019)
 v0.4.1 (Released 1/22/2019)
 ---------------------------
 
-- Hotfix for auth migrations issue
+- Fixed app inadvertently creating migrations on the `Group` model.
 
 
 v0.4.0 (Release Removed)
 ---------------------------
 
-- Added groups listing to admin site
+- Added groups listing to the admin site.
 
 
 v0.3.3 (Released 1/9/2019)
 --------------------------
 
-- Marked docstrings as safe in admin templates
-- No longer suppress inner exceptions when parsing processors
-- Fixed Django admin module permissions check
+- Marked docstrings as safe in admin templates.
+- Inner exceptions on processors are no longer suppressed when parsing views.
+- Fixed Django admin module permissions check.
 
 
 v0.3.2 (Released 1/9/2019)

@@ -40,7 +40,7 @@
 {% elif group_by == 'permission' %}
     {% regroup views|dictsort:"permissions" by permissions as views_list %}
 {% else %}
-    {% regroup views|dictsort:"name" by None as views_list %}
+    {% regroup views|dictsort:"url" by None as views_list %}
 {% endif %}
 
 <div id="content-main">

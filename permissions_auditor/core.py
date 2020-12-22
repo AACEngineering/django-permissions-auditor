@@ -74,7 +74,11 @@ class ViewParser:
 
                 docstrings.append(processor.get_docstring(view))
 
-        return permissions, login_required, '\n'.join(list(set(filter(None, docstrings))))
+        return (
+            list(set(permissions)),
+            login_required,
+            '\n'.join(list(set(filter(None, docstrings))))
+        )
 
 
 def _get_views(urlpatterns=None, base_url=''):
@@ -129,7 +133,7 @@ def _get_views(urlpatterns=None, base_url=''):
 
 def get_views(urlpatterns=None, base_url=''):
     """
-    Get a cached version of _get_views().
+    Wrapper for caching _get_views().
     """
     cache_key = _get_setting('PERMISSIONS_AUDITOR_CACHE_KEY')
     cache_base_url_key = cache_key + '_BASE_URL'

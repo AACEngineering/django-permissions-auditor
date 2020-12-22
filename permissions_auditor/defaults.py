@@ -14,7 +14,9 @@ PERMISSIONS_AUDITOR_BLACKLIST = {
     'namespaces': [
         'admin',
     ],
-    'view_names': [],
+    'view_names': [
+        'django.views.generic.base.RedirectView',
+    ],
     'modules': [],
 }
 PERMISSIONS_AUDITOR_ADMIN = True

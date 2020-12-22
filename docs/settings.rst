@@ -1,3 +1,5 @@
+.. _Settings:
+
 Settings
 ==================
 
@@ -40,7 +42,9 @@ Default::
         'namespaces': [
             'admin',
         ],
-        'view_names': [],
+        'view_names': [
+            'django.views.generic.base.RedirectView',
+        ],
         'modules': [],
     }
 
