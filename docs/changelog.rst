@@ -7,6 +7,7 @@ v1.0.1 (Release TBD)
 - Changed "No Grouping" filter to order by URL instead of view name.
 - Added `django.views.generic.base.RedirectView` to the default `view_names` blacklist.
 - Prevented duplicate permissions from being returned for a single view.
+- Dropped testing support for python 3.5, which reached end of life in September 2020.
 
 
 v1.0.1 (Released 7/1/2020)

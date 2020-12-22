@@ -75,7 +75,7 @@ class ViewParser:
                 docstrings.append(processor.get_docstring(view))
 
         return (
-            list(set(permissions)),
+            sorted(set(permissions)),
             login_required,
             '\n'.join(list(set(filter(None, docstrings))))
         )
