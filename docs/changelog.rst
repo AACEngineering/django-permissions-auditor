@@ -1,7 +1,7 @@
 Changelog
 =========
 
-v1.0.1 (Release TBD)
+v1.0.2 (Released 1/4/2021)
 --------------------------
 
 - Changed "No Grouping" filter to order by URL instead of view name.
