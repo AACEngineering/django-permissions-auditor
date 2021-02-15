@@ -171,7 +171,10 @@ class AuditorGroupAdmin(GroupAdmin):
     def users_display(self, obj):
         result = ''
         for user in obj.active_users:
-            url = reverse('admin:auth_user_change', args=(user.pk,))
+            url = reverse(
+                'admin:{}_{}_change'.format(user._meta.app_label, user._meta.model_name),
+                args=(user.pk,)
+            )
             result += '<a href="{}">{}</a><br/>'.format(url, user)
         return mark_safe(result)
 
