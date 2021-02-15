@@ -1,6 +1,13 @@
 Changelog
 =========
 
+v1.0.3 (Released 2/15/2021)
+--------------------------
+
+- Fixed invalid URL on AuditorGroupAdmin when using a custom user model (#11). Thanks @LerikG.
+- Temporarily removed testing on django master.
+
+
 v1.0.2 (Released 1/4/2021)
 --------------------------
 
