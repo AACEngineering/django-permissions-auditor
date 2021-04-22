@@ -38,6 +38,7 @@ setup(
         'Framework :: Django :: 2.2',
         'Framework :: Django :: 3.0',
         'Framework :: Django :: 3.1',
+        'Framework :: Django :: 3.2',
         'Topic :: Internet :: WWW/HTTP :: Site Management',
         'Topic :: Internet :: WWW/HTTP :: Site Management :: Link Checking',
     ],

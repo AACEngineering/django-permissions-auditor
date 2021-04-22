@@ -1,8 +1,15 @@
 Changelog
 =========
 
+v1.0.4 (Release TBD)
+--------------------
+
+- Changed AuditorGroupAdmin to use the User model's default manager.
+- Confirmed support for Django 3.2.
+
+
 v1.0.3 (Released 2/15/2021)
---------------------------
+---------------------------
 
 - Fixed invalid URL on AuditorGroupAdmin when using a custom user model (#11). Thanks @LerikG.
 - Temporarily removed testing on django master.
