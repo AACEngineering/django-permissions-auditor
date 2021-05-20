@@ -1,8 +1,8 @@
 Changelog
 =========
 
-v1.0.4 (Release TBD)
---------------------
+v1.0.4 (Released 5/20/2021)
+---------------------------
 
 - Changed AuditorGroupAdmin to use the User model's default manager.
 - Confirmed support for Django 3.2.
