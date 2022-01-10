@@ -112,6 +112,7 @@ def _get_views(urlpatterns=None, base_url=''):
 
             # If this is a CBV, use the actual class instead of the as_view() classmethod.
             view = getattr(view, 'view_class', view)
+            view = getattr(view, 'cls', view)
 
             full_view_path = '{}.{}'.format(view.__module__, view.__name__)
             if full_view_path in VIEW_BLACKLIST or view.__module__ in MODULE_BLACKLIST:
