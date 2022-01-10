@@ -11,4 +11,4 @@ build:
 python:
   install:
     - method: setuptools
-        path: .
+      path: .
