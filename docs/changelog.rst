@@ -1,6 +1,13 @@
 Changelog
 =========
 
+v1.0.5 (Released 1/10/2022)
+---------------------------
+
+- Added core support for retrieving Django Rest Framework class instances on DRF views. Note that you will still need to write a custom processor to parse these views. Thanks @jeffgabhart!
+- Added Python 3.10 and Django 4.0 to the test matrix. Removed unsupported Django 3.0 and 3.1 versions.
+
+
 v1.0.4 (Released 5/20/2021)
 ---------------------------
 
