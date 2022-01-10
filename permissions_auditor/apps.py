@@ -9,6 +9,8 @@ class PermissionsAuditorConfig(AppConfig):
     name = 'permissions_auditor'
     verbose_name = _('Permissions Auditor')
 
+    default_auto_field = 'django.db.models.BigAutoField'
+
     def ready(self):
         # Delete the cached views list on application reload.
         cache.delete_many([
