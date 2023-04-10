@@ -153,7 +153,7 @@ class BaseDecoratorProcessor(BaseProcessor):
         return False
 
 
-class BaseFileredMixinProcessor(BaseCBVProcessor):
+class BaseFilteredMixinProcessor(BaseCBVProcessor):
     """
     Base class for parsing mixins on class based views.
     Set ``class_filter`` to filter the class names the processor applies to.

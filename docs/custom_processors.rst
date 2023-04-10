@@ -21,7 +21,7 @@ Other useful base classes:
 
 .. autoclass:: permissions_auditor.processors.base.BaseDecoratorProcessor
 
-.. autoclass:: permissions_auditor.processors.base.BaseFileredMixinProcessor
+.. autoclass:: permissions_auditor.processors.base.BaseFilteredMixinProcessor
     :members: class_filter, get_class_filter
 
 
@@ -55,9 +55,9 @@ Let's define our processor in `processors.py`.
 .. code-block:: python
     :caption: example_project/processors.py
 
-    from permissions_auditor.processors.base import BaseFileredMixinProcessor
+    from permissions_auditor.processors.base import BaseFilteredMixinProcessor
 
-    class BobRequiredMixinProcessor(BaseFileredMixinProcessor):
+    class BobRequiredMixinProcessor(BaseFilteredMixinProcessor):
         class_filter = 'example_project.views.BobRequiredMixin'
 
         def get_login_required(self, view):
@@ -117,9 +117,9 @@ We'll modify ``class_filter`` and ``get_docstring()`` from our old processor, an
 
 .. code-block:: python
 
-    from permissions_auditor.processors.base import BaseFileredMixinProcessor
+    from permissions_auditor.processors.base import BaseFilteredMixinProcessor
 
-    class FirstNameRequiredMixinProcessor(BaseFileredMixinProcessor):
+    class FirstNameRequiredMixinProcessor(BaseFilteredMixinProcessor):
         class_filter = 'example_project.views.FirstNameRequiredMixin'
 
         def get_permission_required(self, view):
