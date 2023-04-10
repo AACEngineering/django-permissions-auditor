@@ -9,7 +9,7 @@ from .base import BaseFileredMixinProcessor
 
 class PermissionRequiredMixinProcessor(BaseFileredMixinProcessor):
     """
-    Processes views that directly inherit from
+    Processes views that inherit from
     ``django.contrib.auth.mixins.PermissionRequiredMixin``.
 
     .. hint::
@@ -43,7 +43,7 @@ class PermissionRequiredMixinProcessor(BaseFileredMixinProcessor):
 
 class LoginRequiredMixinProcessor(BaseFileredMixinProcessor):
     """
-    Processes views that directly inherit from
+    Processes views that inherit from
     ``django.contrib.auth.mixins.LoginRequiredMixin``.
     """
 
@@ -55,7 +55,7 @@ class LoginRequiredMixinProcessor(BaseFileredMixinProcessor):
 
 class UserPassesTestMixinProcessor(BaseFileredMixinProcessor):
     """
-    Processes views that directly inherit from
+    Processes views that inherit from
     ``django.contrib.auth.mixins.UserPassesTestMixin``.
 
     .. hint::
