@@ -18,8 +18,8 @@ setup(
     include_package_data=True,
     python_requires='>=3.5',
     install_requires=[
-        'django>=2.1'
-        'setuptools'
+        'django>=2.1',
+        'setuptools',
     ],
     zip_safe=False,
     test_suite='runtests.runtests',
