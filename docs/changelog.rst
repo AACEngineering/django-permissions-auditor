@@ -4,7 +4,7 @@ Changelog
 v1.1.0 (Released 4/12/2023)
 ---------------------------
 
-- ** Potentially breaking change:** Fixed typo on ``BaseFilteredMixinProcessor`` (previously was ``BaseFileredMixinProcessor``). Thanks @annamooseity!
+- **Potentially breaking change:** Fixed typo on ``BaseFilteredMixinProcessor`` (previously was ``BaseFileredMixinProcessor``). Thanks @annamooseity!
 - ``BaseFilteredMixinProcessor`` now inspects all inherited classes instead of only its direct parent. Thanks @annamooseity!
 - Added Python 3.11 and Django 4.1 and 4.2 to the test matrix. Removed unsupported Python 3.6.
 
