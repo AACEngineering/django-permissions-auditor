@@ -4,12 +4,12 @@ import inspect
 
 from django.conf import ImproperlyConfigured
 
-from .base import BaseFileredMixinProcessor
+from .base import BaseFilteredMixinProcessor
 
 
-class PermissionRequiredMixinProcessor(BaseFileredMixinProcessor):
+class PermissionRequiredMixinProcessor(BaseFilteredMixinProcessor):
     """
-    Processes views that directly inherit from
+    Processes views that inherit from
     ``django.contrib.auth.mixins.PermissionRequiredMixin``.
 
     .. hint::
@@ -41,9 +41,9 @@ class PermissionRequiredMixinProcessor(BaseFileredMixinProcessor):
         return docstring
 
 
-class LoginRequiredMixinProcessor(BaseFileredMixinProcessor):
+class LoginRequiredMixinProcessor(BaseFilteredMixinProcessor):
     """
-    Processes views that directly inherit from
+    Processes views that inherit from
     ``django.contrib.auth.mixins.LoginRequiredMixin``.
     """
 
@@ -53,9 +53,9 @@ class LoginRequiredMixinProcessor(BaseFileredMixinProcessor):
         return True
 
 
-class UserPassesTestMixinProcessor(BaseFileredMixinProcessor):
+class UserPassesTestMixinProcessor(BaseFilteredMixinProcessor):
     """
-    Processes views that directly inherit from
+    Processes views that inherit from
     ``django.contrib.auth.mixins.UserPassesTestMixin``.
 
     .. hint::

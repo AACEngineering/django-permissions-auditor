@@ -39,7 +39,7 @@ class BaseCBVProcessorTest(ProcessorTestCase):
 
 class BaseFilteredMixinProcessorTest(ProcessorTestCase):
     def setUp(self):
-        self.processor = base.BaseFileredMixinProcessor()
+        self.processor = base.BaseFilteredMixinProcessor()
 
     def test_no_class_filter_raises_exception(self):
         with self.assertRaises(ImproperlyConfigured):

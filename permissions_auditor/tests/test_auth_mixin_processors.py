@@ -36,6 +36,9 @@ class TestLoginRequiredMixinProcessor(MixinProcessorTestCaseMixin, ProcessorTest
     def test_cb_loginrequiredview(self):
         self.assertCanProcessView(views.LoginRequiredView, **self.expected_results)
 
+    def test_cb_inheritedloginrequiredview(self):
+        self.assertCanProcessView(views.InheritedLoginRequiredView, **self.expected_results)
+
 
 class TestPermissionRequiredMixinProcessor(MixinProcessorTestCaseMixin, ProcessorTestCase):
 
@@ -52,6 +55,12 @@ class TestPermissionRequiredMixinProcessor(MixinProcessorTestCaseMixin, Processo
     def test_cb_permissionsrequiredview(self):
         self.assertCanProcessView(
             views.PermissionRequiredView,
+            permissions=['tests.test_perm'], login_required=True, docstring=None
+        )
+
+    def test_cb_inherit_permissionsrequiredview(self):
+        self.assertCanProcessView(
+            views.InheritedPermissionRequiredView,
             permissions=['tests.test_perm'], login_required=True, docstring=None
         )
 
@@ -109,6 +118,12 @@ class TestUserPassesTestMixinProcessor(MixinProcessorTestCaseMixin, ProcessorTes
     def test_cb_userpassestestview(self):
         self.assertCanProcessView(
             views.UserPassesTestView,
+            permissions=[], login_required=None, docstring='Custom (no docstring found)'
+        )
+
+    def test_cb_inheriteduserpassestestview(self):
+        self.assertCanProcessView(
+            views.InheritedUserPassesTestView,
             permissions=[], login_required=None, docstring='Custom (no docstring found)'
         )
 

@@ -153,7 +153,7 @@ class BaseDecoratorProcessor(BaseProcessor):
         return False
 
 
-class BaseFileredMixinProcessor(BaseCBVProcessor):
+class BaseFilteredMixinProcessor(BaseCBVProcessor):
     """
     Base class for parsing mixins on class based views.
     Set ``class_filter`` to filter the class names the processor applies to.
@@ -167,10 +167,10 @@ class BaseFileredMixinProcessor(BaseCBVProcessor):
         if not super().can_process(view):
             return False
 
-        view_bases = [cls.__module__ + '.' + cls.__name__ for cls in view.__bases__]
+        view_parents = [cls.__module__ + '.' + cls.__name__ for cls in view.__mro__]
 
         for cls_filter in self.get_class_filter():
-            if cls_filter in view_bases:
+            if cls_filter in view_parents:
                 return True
 
         return False

@@ -21,6 +21,10 @@ class LoginRequiredView(LoginRequiredMixin, View):
     pass
 
 
+class InheritedLoginRequiredView(LoginRequiredView):
+    pass
+
+
 class LoginRequiredMethodDecoratorView(View):
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
@@ -29,6 +33,10 @@ class LoginRequiredMethodDecoratorView(View):
 
 class PermissionRequiredView(PermissionRequiredMixin, View):
     permission_required = 'tests.test_perm'
+
+
+class InheritedPermissionRequiredView(PermissionRequiredView):
+    pass
 
 
 class PermissionRequiredMultiView(PermissionRequiredMixin, View):
@@ -70,6 +78,11 @@ class StaffMemberRequiredMethodDecoratorView(View):
 
 
 class UserPassesTestView(UserPassesTestMixin, View):
+    def test_func(self):
+        return True
+
+
+class InheritedUserPassesTestView(UserPassesTestView):
     def test_func(self):
         return True
 
