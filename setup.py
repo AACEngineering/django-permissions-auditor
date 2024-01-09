@@ -14,7 +14,10 @@ setup(
     author='AAC Engineering',
     url='https://github.com/AACEngineering/django-permissions-auditor',
     license='MIT',
-    packages=find_packages(exclude=['example']),
+    packages=find_packages(
+        exclude=['example'],
+        include=['permissions_auditor.templates.permissions_auditor.admin']
+    ),
     include_package_data=True,
     python_requires='>=3.5',
     install_requires=[
