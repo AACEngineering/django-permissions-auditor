@@ -1,6 +1,13 @@
 Changelog
 =========
 
+v1.2.0 (Released 1/9/2024)
+--------------------------
+
+- Added ``dump_view_permissions`` management command.
+- Added Python 3.12 and Django 5.0 to the test matrix. Removed unsupported Python 3.7.
+
+
 v1.1.0 (Released 4/12/2023)
 ---------------------------
 
