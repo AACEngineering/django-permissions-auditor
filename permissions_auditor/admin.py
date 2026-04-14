@@ -186,7 +186,7 @@ class AuditorGroupAdmin(GroupAdmin):
             'permissions',
             'permissions__content_type',
             Prefetch(
-                'user_set',
+                _get_setting('PERMISSIONS_AUDITOR_GROUPS_TO_USERS_RELATED'),
                 queryset=get_user_model()._default_manager.filter(is_active=True),
                 to_attr='active_users'
             )
