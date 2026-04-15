@@ -78,6 +78,21 @@ Default: ``True``
 
 
 
+.. _PERMISSIONS_AUDITOR_GROUPS_TO_USERS_RELATED:
+
+PERMISSIONS_AUDITOR_GROUPS_TO_USERS_RELATED
+-----------------------------------------
+
+The related name used to prefetch users by their group. This is used to prefetch the active users of a 
+group for the group's admin page. This is needed if you are using a custom user model and have altered the
+relationship from your custom user model to ``Group`` to use a ``related_name`` or ``related_query_name`` 
+other than the default, ``'user_set'``. Has no effect if :ref:`PERMISSIONS_AUDITOR_ADMIN_OVERRIDE_GROUPS` is 
+set to ``False``.
+
+Default: ``'user_set'``
+
+
+
 .. _PERMISSIONS_AUDITOR_ROOT_URLCONF:
 
 PERMISSIONS_AUDITOR_ROOT_URLCONF
